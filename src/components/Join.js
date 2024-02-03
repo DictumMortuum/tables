@@ -1,12 +1,12 @@
 import React from 'react';
 import { Box, Button, Snackbar } from '@mui/material';
 import Table from './Table';
-import { useFetch } from '@uidotdev/usehooks';
 import { useParams } from 'react-router-dom';
 import { createParticipant, removeParticipant } from './api';
 import { useEmail } from '../hooks/useEmail';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import { useFetch } from '../hooks/useFetch';
 
 const LeaveButton = ({ participation, setJoined, setParticipations, setError }) => {
   const [isSearching, setIsSearching] = React.useState(false);
@@ -43,7 +43,6 @@ const JoinButton = ({ id, user_id, email, setJoined, setParticipations, setError
 
   const onClick = async () => {
     if (!user_id  || !email) {
-      console.log(!user_id, !email, "whoops");
       setError("Please log in");
       return
     }
@@ -80,8 +79,12 @@ const JoinButton = ({ id, user_id, email, setJoined, setParticipations, setError
 
 const JoinContent = () => {
   const { id } = useParams();
-  const { data } = useFetch(`${process.env.REACT_APP_ENDPOINT}/tables/${id}`)
+  const { loading, data } = useFetch(`${process.env.REACT_APP_ENDPOINT}/rest/tables/${id}`, undefined)
   const { user_id, email } = useEmail();
+
+  if (loading === true) {
+    return <></>
+  }
 
   if (data === undefined || user_id === null || email === null) {
     return <></>
@@ -90,7 +93,8 @@ const JoinContent = () => {
   return <Join data={data} id={id} user_id={user_id} email={email} />
 }
 
-const Join = ({ data, user_id, email }) => {
+const Join = props => {
+  const { data, user_id, email } = props;
   const [joined, setJoined] = React.useState(data.participants.map(d => d.user_id).includes(user_id));
   const [participations, setParticipations] = React.useState(data.participants.filter(d => d.user_id === user_id));
   const [error, setError] = React.useState(null);

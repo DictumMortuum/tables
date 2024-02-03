@@ -1,14 +1,17 @@
 import React from 'react';
 import { Grid } from '@mui/material';
-import { useFetch } from '@uidotdev/usehooks';
+// import { useFetch } from '@uidotdev/usehooks';
 import { Join } from './Join';
 import { useEmail } from '../hooks/useEmail';
+import { useFetch } from '../hooks/useFetch';
 
 const HomeContent = () => {
-  const { data } = useFetch(`${process.env.REACT_APP_ENDPOINT}/rest/tables`)
+  const { data, loading } = useFetch(`${process.env.REACT_APP_ENDPOINT}/rest/tables`, []);
   const { user_id, email } = useEmail();
 
-  console.log(user_id, email);
+  if (loading) {
+    return <>Loading...</>
+  }
 
   if (data === undefined || user_id === null || email === null) {
     return <></>

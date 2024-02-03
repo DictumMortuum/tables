@@ -20,8 +20,8 @@ import 'dayjs/locale/en-gb';
 SuperTokens.init({
   appInfo: {
     appName: "auth",
-    apiDomain: "https://auth.dictummortuum.com",
-    websiteDomain: "http://localhost:3000",
+    apiDomain: process.env.REACT_APP_AUTH_ENDPOINT,
+    websiteDomain: process.env.REACT_APP_WEBSITE,
     apiBasePath: "/auth",
     websiteBasePath: "/auth"
   },
@@ -51,7 +51,11 @@ const App = () => {
           <HashRouter>
             <Routes>
               <Route path="/" element={<Layout />}>
-                <Route index element={<Home />} />
+                <Route index element={
+                  <SessionAuth requireAuth={true}>
+                    <Home />
+                  </SessionAuth>
+                } />
                 {getSuperTokensRoutesForReactRouterDom(reactRouterDom, [ThirdPartyEmailPasswordPreBuiltUI])}
                 <Route path="/create" element={
                   <SessionAuth requireAuth={true}>
