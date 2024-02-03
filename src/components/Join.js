@@ -124,7 +124,7 @@ const Join = props => {
     <Box>
       {joined && <Table
         {...data}
-        participants={participations}
+        // participants={data.participants}
         button={
           <LeaveButton
             participation={participations[0]}
@@ -136,7 +136,7 @@ const Join = props => {
       />}
       {!joined && <Table
         {...data}
-        participants={participations}
+        // participants={participations}
         button={
           <JoinButton
             user_id={user_id}
