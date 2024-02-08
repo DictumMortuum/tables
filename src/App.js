@@ -26,7 +26,19 @@ SuperTokens.init({
     websiteBasePath: "/auth"
   },
   recipeList: [
-    ThirdPartyEmailPassword.init(),
+    ThirdPartyEmailPassword.init({
+      getRedirectionURL: async (context) => {
+        if (context.action === "SUCCESS") {
+          const redirect = localStorage.getItem("redirectURL");
+
+          if (redirect !== undefined) {
+            localStorage.clear();
+            return redirect
+          }
+        }
+        return undefined;
+    }
+    }),
     Session.init()
   ]
 });

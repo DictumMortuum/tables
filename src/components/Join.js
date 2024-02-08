@@ -1,8 +1,7 @@
 import React from 'react';
 import { Box, Button, Snackbar, Stack } from '@mui/material';
-import { redirectToAuth } from "supertokens-auth-react";
 import Table from './Table';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { createParticipant, deleteTable, removeParticipant } from './api';
 import { useEmail } from '../hooks/useEmail';
 import IconButton from '@mui/material/IconButton';
@@ -48,11 +47,14 @@ const LeaveButton = ({ user_id, setJoined, participations, setParticipations, se
 
 const JoinButton = ({ id, user_id, email, setJoined, participations, setParticipations, setError }) => {
   const [isSearching, setIsSearching] = React.useState(false);
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   const onClick = async () => {
     if (!user_id || !email) {
       setError("Please log in");
-      redirectToAuth();
+      localStorage.setItem("redirectURL", pathname);
+      navigate("/")
       return
     }
 
