@@ -1,19 +1,27 @@
 import React from 'react';
-import { Box, Button, Snackbar } from '@mui/material';
+import { Box, Button, Snackbar, Stack } from '@mui/material';
+import { redirectToAuth } from "supertokens-auth-react";
 import Table from './Table';
 import { useParams } from 'react-router-dom';
-import { createParticipant, removeParticipant } from './api';
+import { createParticipant, deleteTable, removeParticipant } from './api';
 import { useEmail } from '../hooks/useEmail';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { useFetch } from '../hooks/useFetch';
 
-const LeaveButton = ({ participation, setJoined, setParticipations, setError }) => {
+const LeaveButton = ({ user_id, setJoined, participations, setParticipations, setError }) => {
   const [isSearching, setIsSearching] = React.useState(false);
 
   const onClick = async () => {
     setIsSearching(true);
-    const rs = await removeParticipant(participation.id);
+    const participation = participations.filter(d => d.user_id === user_id);
+
+    if (participation.length !== 1) {
+      setError("You do not participate in this table.");
+      return
+    }
+
+    const rs = await removeParticipant(participation[0].id);
 
     setIsSearching(false);
     if (rs?.errors) {
@@ -21,7 +29,7 @@ const LeaveButton = ({ participation, setJoined, setParticipations, setError }) 
       return
     }
 
-    setParticipations([]);
+    setParticipations(participations.filter(d => d.user_id !== user_id));
     setJoined(false);
   };
 
@@ -38,12 +46,13 @@ const LeaveButton = ({ participation, setJoined, setParticipations, setError }) 
   );
 }
 
-const JoinButton = ({ id, user_id, email, setJoined, setParticipations, setError }) => {
+const JoinButton = ({ id, user_id, email, setJoined, participations, setParticipations, setError }) => {
   const [isSearching, setIsSearching] = React.useState(false);
 
   const onClick = async () => {
-    if (!user_id  || !email) {
+    if (!user_id || !email) {
       setError("Please log in");
+      redirectToAuth();
       return
     }
 
@@ -62,7 +71,7 @@ const JoinButton = ({ id, user_id, email, setJoined, setParticipations, setError
     }
 
     setJoined(true);
-    setParticipations([rs]);
+    setParticipations([...participations, rs]);
   };
 
   return (
@@ -76,6 +85,37 @@ const JoinButton = ({ id, user_id, email, setJoined, setParticipations, setError
     </Button>
   );
 }
+
+const DeleteButton = ({ id, setError, setHidden }) => {
+  const [isSearching, setIsSearching] = React.useState(false);
+
+  const onClick = async () => {
+    setIsSearching(true);
+
+    const rs = await deleteTable(id);
+
+    setIsSearching(false);
+    if (rs?.errors) {
+      setError(rs.errors.error);
+      return
+    }
+
+    setHidden(true);
+  };
+
+  return (
+    <Button
+      variant="contained"
+      disabled={isSearching}
+      onClick={onClick}
+      color="warning"
+      fullWidth
+    >
+      Delete
+    </Button>
+  );
+}
+
 
 const JoinContent = () => {
   const { id } = useParams();
@@ -96,8 +136,9 @@ const JoinContent = () => {
 const Join = props => {
   const { data, user_id, email } = props;
   const [joined, setJoined] = React.useState(data.participants.map(d => d.user_id).includes(user_id));
-  const [participations, setParticipations] = React.useState(data.participants.filter(d => d.user_id === user_id));
+  const [participations, setParticipations] = React.useState(data.participants);
   const [error, setError] = React.useState(null);
+  const [hidden, setHidden] = React.useState(false);
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -120,14 +161,20 @@ const Join = props => {
     </React.Fragment>
   );
 
+  if (hidden) {
+    return <></>
+  }
+
   return (
     <Box>
       {joined && <Table
         {...data}
-        // participants={data.participants}
+        participants={participations}
         button={
           <LeaveButton
-            participation={participations[0]}
+            // participation={participations[0]}
+            user_id={user_id}
+            participations={participations}
             setJoined={setJoined}
             setParticipations={setParticipations}
             setError={setError}
@@ -136,16 +183,24 @@ const Join = props => {
       />}
       {!joined && <Table
         {...data}
-        // participants={participations}
+        participants={participations}
         button={
-          <JoinButton
-            user_id={user_id}
-            email={email}
-            setJoined={setJoined}
-            setParticipations={setParticipations}
-            setError={setError}
-            {...data}
-          />
+          <Stack direction="row" spacing={2} sx={{ width: "100%"}}>
+            <JoinButton
+              user_id={user_id}
+              email={email}
+              participations={participations}
+              setJoined={setJoined}
+              setParticipations={setParticipations}
+              setError={setError}
+              {...data}
+            />
+            {data.creator_id === user_id && <DeleteButton
+              setError={setError}
+              setHidden={setHidden}
+              {...data}
+            />}
+          </Stack>
         }
       />}
       <Snackbar

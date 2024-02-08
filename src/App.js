@@ -32,11 +32,19 @@ SuperTokens.init({
 });
 
 const Layout = () => {
+  // const onLogout = async () => {
+  //   await signOut();
+  //   window.location.href = "/";
+  // }
+
   return (
     <Container>
       <Stack direction="row" spacing={2} mt={1}>
         <Button component={Link} to="/">Home</Button>
         <Button component={Link} to="/create">Create</Button>
+        {/* <SessionAuth>
+          <Button onClick={onLogout}>Logout</Button>
+        </SessionAuth> */}
       </Stack>
       <Outlet />
     </Container>
@@ -52,13 +60,13 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Layout />}>
                 <Route index element={
-                  <SessionAuth requireAuth={true}>
+                  <SessionAuth>
                     <Home />
                   </SessionAuth>
                 } />
                 {getSuperTokensRoutesForReactRouterDom(reactRouterDom, [ThirdPartyEmailPasswordPreBuiltUI])}
                 <Route path="/create" element={
-                  <SessionAuth requireAuth={true}>
+                  <SessionAuth>
                     <Create />
                   </SessionAuth>
                 } />

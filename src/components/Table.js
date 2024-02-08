@@ -34,65 +34,72 @@ const dateOptions = {
 };
 
 const Table = ({ id, creator, boardgame, location, date, seats, participants, button, expand=false }) => {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
 
   const handleClick = () => {
     setOpen(!open);
   };
 
   return (
-      <TableContainer
-        id={id}
-        boardgame={boardgame}
-        expand={expand}
-        participants={participants}
-        nameElement={
-          <ListItemText primary={
-            <Typography variant="h5">
-              {boardgame.name}
-            </Typography>
-          } secondary="boardgame" />
+    <TableContainer
+      id={id}
+      boardgame={boardgame}
+      expand={expand}
+      participants={participants}
+      nameElement={
+        <ListItemText primary={
+          <Typography variant="h5">
+            {boardgame.name}
+          </Typography>
+        } secondary={
+          <Link to={`https://boardgamegeek.com/boardgame/${boardgame.id}`}>[bgg link]</Link>
         }
-        creatorElement={
-          <ListItemText primary={creator} secondary="host" />
-        }
-        participantsElement={
-          <>
-            <ListItemButton onClick={handleClick}>
-              <ListItemIcon>
-                <Avatar>
-                  <PeopleIcon />
-                </Avatar>
-              </ListItemIcon>
-              <ListItemText primary={`${participants.length}/${seats}`} secondary="participants" />
-              {open ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-            <Collapse in={open} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                {participants.map((d, i) => (
-                  <ListItem key={i} sx={{ pl: 4 }}>
-                    <ListItemIcon>
-                      <StarBorder />
-                    </ListItemIcon>
-                    <ListItemText primary={d.name} />
-                  </ListItem>
-                ))}
-              </List>
-            </Collapse>
-          </>
-        }
-        dateElement={
-          <ListItemText primary={new Date(date).toLocaleString('en-GB', dateOptions)} secondary="date" />
-        }
-        locationElement={
-          <ListItemText primary={location} secondary="location" />
-        }
-        buttonElement={button}
-      />
+        />
+      }
+      creatorElement={
+        <ListItemText primary={creator} secondary="host" />
+      }
+      participantsElement={
+        <>
+          <ListItemButton onClick={handleClick}>
+            <ListItemIcon>
+              <Avatar>
+                <PeopleIcon />
+              </Avatar>
+            </ListItemIcon>
+            <ListItemText primary={`${participants.length}/${seats}`} secondary="participants" />
+            {open ? <ExpandLess /> : <ExpandMore />}
+          </ListItemButton>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              {participants.map((d, i) => (
+                <ListItem key={i} sx={{ pl: 4 }}>
+                  <ListItemIcon>
+                    <StarBorder />
+                  </ListItemIcon>
+                  <ListItemText primary={d.name} />
+                </ListItem>
+              ))}
+            </List>
+          </Collapse>
+        </>
+      }
+      dateElement={
+        <ListItemText primary={new Date(date).toLocaleString('en-GB', dateOptions)} secondary="date" />
+      }
+      locationElement={
+        <ListItemText primary={
+          <Link to={
+            `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`
+          }>{location}</Link>
+        } secondary="location" />
+      }
+      buttonElement={button}
+    />
   );
 }
 
-const TableContainer = ({ id, boardgame, participants, nameElement, creatorElement, participantsElement, dateElement, locationElement, buttonElement }) => {
+const TableContainer = ({ id, boardgame, nameElement, creatorElement, participantsElement, dateElement, locationElement, buttonElement }) => {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up('sm'));
 
