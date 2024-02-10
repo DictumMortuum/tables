@@ -23,6 +23,7 @@ import { useTheme } from '@mui/material/styles';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import StarBorder from '@mui/icons-material/StarBorder';
+import { AddToCalendarButton } from 'add-to-calendar-button-react';
 
 const dateOptions = {
   weekday: 'long',
@@ -33,8 +34,25 @@ const dateOptions = {
   minute: 'numeric',
 };
 
+const yyyymmdd = (d, add) => {
+  const MM = d.getMonth() + 1; // getMonth() is zero-based
+  const DD = d.getDate();
+  const year = [d.getFullYear(), (MM > 9 ? '' : '0') + MM, (DD > 9 ? '' : '0') + DD].join('-');
+  return [year, hhmm(d, add)].join('T');
+};
+
+const hhmm = (d, add) => {
+  var hh = d.getHours();
+  const mm = d.getMinutes();
+  if (add !== undefined) {
+    hh += add
+  }
+  return [(hh > 9 ? '' : '0') + hh, (mm > 9 ? '' : '0') + mm].join(':');
+}
+
 const Table = ({ id, creator, boardgame, location, date, seats, participants, button, expand=false }) => {
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
+  const d = new Date(date);
 
   const handleClick = () => {
     setOpen(!open);
@@ -85,7 +103,18 @@ const Table = ({ id, creator, boardgame, location, date, seats, participants, bu
         </>
       }
       dateElement={
-        <ListItemText primary={new Date(date).toLocaleString('en-GB', dateOptions)} secondary="date" />
+        <>
+          <ListItemText primary={d.toLocaleString('en-GB', dateOptions)} secondary="date" />
+          <AddToCalendarButton
+            name={boardgame.name}
+            startDate={yyyymmdd(d)}
+            endDate={yyyymmdd(d, 4)}
+            options={['Apple','Google','Yahoo','iCal']}
+            timeZone="Europe/Athens"
+            location={location}
+            // organizer={creator}
+          ></AddToCalendarButton>
+        </>
       }
       locationElement={
         <ListItemText primary={
@@ -128,15 +157,6 @@ const TableContainer = ({ id, boardgame, nameElement, creatorElement, participan
               </ListItemIcon>
               {nameElement}
             </ListItem>
-            {creatorElement !== undefined && <ListItem>
-              <ListItemIcon>
-                <Avatar>
-                  <PersonIcon />
-                </Avatar>
-              </ListItemIcon>
-              {creatorElement}
-            </ListItem>}
-            {participantsElement}
             <ListItem>
               <ListItemIcon>
                 <Avatar>
@@ -153,6 +173,15 @@ const TableContainer = ({ id, boardgame, nameElement, creatorElement, participan
               </ListItemIcon>
               {locationElement}
             </ListItem>
+            {creatorElement !== undefined && <ListItem>
+              <ListItemIcon>
+                <Avatar>
+                  <PersonIcon />
+                </Avatar>
+              </ListItemIcon>
+              {creatorElement}
+            </ListItem>}
+            {participantsElement}
             <ListItem>
               {buttonElement}
             </ListItem>
