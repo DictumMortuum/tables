@@ -1,17 +1,18 @@
 import { useContext, useEffect } from 'react';
 import { UserContext } from '../context';
+import { authProvider } from 'servus-react-login';
 
 export const useEmail = () => {
   const { email, setEmail, user_id, setUserId } = useContext(UserContext);
 
   useEffect(() => {
     if (email === null || user_id === null || email === undefined || user_id === undefined) {
-      fetch(`${process.env.REACT_APP_AUTH_ENDPOINT}/auth/userinfo`)
-      .then(rs => rs.json())
-      .then(({ id, email }) => {
+      authProvider.getIdentity().then(({ id, email}) => {
         setEmail(email);
         setUserId(id);
-      });
+      }).catch(err => {
+        console.log(err)
+      })
     }
   }, [email, setEmail, user_id, setUserId])
 
