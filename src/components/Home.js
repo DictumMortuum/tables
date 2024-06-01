@@ -53,7 +53,7 @@ const HomeContent = () => {
       ))}
       <Grid item xs={12}>
         <Box display="flex" justifyContent="flex-end">
-          <Button component={Link} variant="contained" to="/create">Create</Button>
+          <Button component={Link} variant="contained" color="secondary" to="/create">Create</Button>
         </Box>
       </Grid>
     </Grid>

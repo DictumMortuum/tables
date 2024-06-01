@@ -1,13 +1,16 @@
 import React from "react";
+import { useTheme } from '@mui/material/styles';
 import { Box, Container, Grid, Typography } from "@mui/material";
 
 const Component = () => {
+  const theme = useTheme();
+
   return (
     <Box
       sx={{
         width: "100%",
         height: "auto",
-        backgroundColor: "black",
+        backgroundColor: theme.palette.primary.main,
         paddingTop: "1rem",
         paddingBottom: "1rem",
         marginTop: "auto"

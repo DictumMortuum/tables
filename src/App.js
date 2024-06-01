@@ -13,14 +13,15 @@ import { UserProvider } from './context';
 import 'dayjs/locale/en-gb';
 import { useEmail } from './hooks/useEmail';
 import Footer from './components/Footer';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const Layout = () => {
+  const { email } = useEmail();
+
   const onLogout = async () => {
     await authProvider.logout();
     window.location.href = "/";
   }
-
-  const { email } = useEmail();
 
   return (
     <Stack direction="column" sx={{ height: "100%" }}>
@@ -40,26 +41,52 @@ const Layout = () => {
   );
 }
 
+const theme = createTheme({
+  palette: {
+    mode: 'light',
+    primary: {
+      main: '#2e3440',
+    },
+    secondary: {
+      main: '#bf616a',
+    },
+    error: {
+      main: '#d08770',
+    },
+    warning: {
+      main: '#ebcb8b',
+    },
+    success: {
+      main: '#a3be8c',
+    },
+    background: {
+      default: '#eceff4',
+    },
+  },
+});
+
 const App = () => {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
-      <UserProvider>
-        <HashRouter>
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Home />} />
-              <Route path="/auth/reset-password" element={<Reset />} />
-              <Route path="/auth/login" element={<Login />} />
-              <Route path="/create" element={
-                <SessionAuth>
-                  <Create />
-                </SessionAuth>
-              } />
-              <Route path="/show/:id" element={<Join />} />
-            </Route>
-          </Routes>
-        </HashRouter>
-      </UserProvider>
+      <ThemeProvider theme={theme}>
+        <UserProvider>
+          <HashRouter>
+            <Routes>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Home />} />
+                <Route path="/auth/reset-password" element={<Reset />} />
+                <Route path="/auth/login" element={<Login />} />
+                <Route path="/create" element={
+                  <SessionAuth>
+                    <Create />
+                  </SessionAuth>
+                } />
+                <Route path="/show/:id" element={<Join />} />
+              </Route>
+            </Routes>
+          </HashRouter>
+        </UserProvider>
+      </ThemeProvider>
     </LocalizationProvider>
   );
 }

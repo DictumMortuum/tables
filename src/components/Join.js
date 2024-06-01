@@ -38,7 +38,7 @@ const LeaveButton = ({ setJoined, participations, setParticipations, setError })
       variant="contained"
       disabled={isSearching}
       onClick={onClick}
-      color="error"
+      color="secondary"
       fullWidth
     >
       Leave
