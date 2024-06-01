@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Button, Snackbar, Stack } from '@mui/material';
 import Table from './Table';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
@@ -142,6 +142,12 @@ const Join = props => {
   const [participations, setParticipations] = React.useState(data.participants);
   const [error, setError] = React.useState(null);
   const [hidden, setHidden] = React.useState(false);
+
+  useEffect(() => {
+    if (data.participants.map(d => d.user_id).includes(user_id)) {
+      setJoined(true);
+    }
+  }, [user_id, data.participants])
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
