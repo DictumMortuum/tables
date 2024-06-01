@@ -7,8 +7,9 @@ export const useEmail = () => {
 
   useEffect(() => {
     if (email === null || user_id === null || email === undefined || user_id === undefined) {
-      authProvider.getIdentity().then(({ id, email}) => {
-        setEmail(email);
+      authProvider.getIdentity().then(identity => {
+        const { user, id } = identity;
+        setEmail(user);
         setUserId(id);
       }).catch(err => {
         console.log(err)

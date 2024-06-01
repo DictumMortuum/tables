@@ -8,8 +8,9 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { useFetch } from '../hooks/useFetch';
 
-const LeaveButton = ({ user_id, setJoined, participations, setParticipations, setError }) => {
+const LeaveButton = ({ setJoined, participations, setParticipations, setError }) => {
   const [isSearching, setIsSearching] = React.useState(false);
+  const { user_id } = useEmail();
 
   const onClick = async () => {
     setIsSearching(true);
@@ -45,16 +46,17 @@ const LeaveButton = ({ user_id, setJoined, participations, setParticipations, se
   );
 }
 
-const JoinButton = ({ id, user_id, email, setJoined, participations, setParticipations, setError }) => {
+const JoinButton = ({ id, setJoined, participations, setParticipations, setError }) => {
   const [isSearching, setIsSearching] = React.useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { user_id, email } = useEmail();
 
   const onClick = async () => {
     if (!user_id || !email) {
       setError("Please log in");
       localStorage.setItem("redirectURL", pathname);
-      navigate("/")
+      navigate("/auth/login")
       return
     }
 
@@ -118,25 +120,24 @@ const DeleteButton = ({ id, setError, setHidden }) => {
   );
 }
 
-
 const JoinContent = () => {
   const { id } = useParams();
   const { loading, data } = useFetch(`${process.env.REACT_APP_ENDPOINT}/rest/tables/${id}`, undefined)
-  const { user_id, email } = useEmail();
 
   if (loading === true) {
     return <></>
   }
 
-  if (data === undefined || user_id === null || email === null) {
+  if (data === undefined) {
     return <></>
   }
 
-  return <Join data={data} id={id} user_id={user_id} email={email} />
+  return <Join data={data} id={id} />
 }
 
 const Join = props => {
-  const { data, user_id, email } = props;
+  const { data } = props;
+  const { user_id, email } = useEmail();
   const [joined, setJoined] = React.useState(data.participants.map(d => d.user_id).includes(user_id));
   const [participations, setParticipations] = React.useState(data.participants);
   const [error, setError] = React.useState(null);
@@ -175,7 +176,6 @@ const Join = props => {
         button={
           <LeaveButton
             // participation={participations[0]}
-            user_id={user_id}
             participations={participations}
             setJoined={setJoined}
             setParticipations={setParticipations}
@@ -189,7 +189,6 @@ const Join = props => {
         button={
           <Stack direction="row" spacing={2} sx={{ width: "100%"}}>
             <JoinButton
-              user_id={user_id}
               email={email}
               participations={participations}
               setJoined={setJoined}

@@ -50,9 +50,11 @@ const hhmm = (d, add) => {
   return [(hh > 9 ? '' : '0') + hh, (mm > 9 ? '' : '0') + mm].join(':');
 }
 
-const Table = ({ id, creator, boardgame, location, date, seats, participants, button, expand=false }) => {
+const Table = props => {
+  const { id, creator, boardgame, location, date, seats, participants, button, expand=false } = props;
   const [open, setOpen] = React.useState(false);
   const d = new Date(date);
+  const now = new Date();
 
   const handleClick = () => {
     setOpen(!open);
@@ -63,6 +65,7 @@ const Table = ({ id, creator, boardgame, location, date, seats, participants, bu
       id={id}
       boardgame={boardgame}
       expand={expand}
+      archive={d < now}
       participants={participants}
       nameElement={
         <ListItemText primary={
@@ -103,18 +106,18 @@ const Table = ({ id, creator, boardgame, location, date, seats, participants, bu
         </>
       }
       dateElement={
-        <>
-          <ListItemText primary={d.toLocaleString('en-GB', dateOptions)} secondary="date" />
-          <AddToCalendarButton
-            name={boardgame.name}
-            startDate={yyyymmdd(d)}
-            endDate={yyyymmdd(d, 4)}
-            options={['Apple','Google','Yahoo','iCal']}
-            timeZone="Europe/Athens"
-            location={location}
-            // organizer={creator}
-          ></AddToCalendarButton>
-        </>
+        <ListItemText primary={d.toLocaleString('en-GB', dateOptions)} secondary="date" />
+      }
+      addToCalendarElement={
+        <AddToCalendarButton
+          name={boardgame.name}
+          startDate={yyyymmdd(d)}
+          endDate={yyyymmdd(d, 4)}
+          options={['Apple','Google','Yahoo','iCal']}
+          timeZone="Europe/Athens"
+          location={location}
+          // organizer={creator}
+        ></AddToCalendarButton>
       }
       locationElement={
         <ListItemText primary={
@@ -128,9 +131,22 @@ const Table = ({ id, creator, boardgame, location, date, seats, participants, bu
   );
 }
 
-const TableContainer = ({ id, boardgame, nameElement, creatorElement, participantsElement, dateElement, locationElement, buttonElement }) => {
+const TableContainer = props => {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up('sm'));
+
+  const {
+    id,
+    boardgame,
+    nameElement,
+    creatorElement,
+    participantsElement,
+    dateElement,
+    locationElement,
+    buttonElement,
+    addToCalendarElement,
+    archive,
+  } = props;
 
   let right_width, left_width;
   if (!matches) {
@@ -157,6 +173,9 @@ const TableContainer = ({ id, boardgame, nameElement, creatorElement, participan
               </ListItemIcon>
               {nameElement}
             </ListItem>
+            { addToCalendarElement !== undefined && !archive && <ListItem>
+              {addToCalendarElement}
+            </ListItem>}
             <ListItem>
               <ListItemIcon>
                 <Avatar>
@@ -182,9 +201,9 @@ const TableContainer = ({ id, boardgame, nameElement, creatorElement, participan
               {creatorElement}
             </ListItem>}
             {participantsElement}
-            <ListItem>
+            { !archive && <ListItem>
               {buttonElement}
-            </ListItem>
+            </ListItem>}
           </List>
         </CardContent>
       </Box>

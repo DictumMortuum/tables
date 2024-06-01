@@ -1,33 +1,61 @@
 import React from 'react';
-import { Grid } from '@mui/material';
-// import { useFetch } from '@uidotdev/usehooks';
+import { Grid, Checkbox, FormControlLabel, Button, Box } from '@mui/material';
+import { Link } from "react-router-dom";
 import { Join } from './Join';
-import { useEmail } from '../hooks/useEmail';
 import { useFetch } from '../hooks/useFetch';
 
+const dateFilter = show => ({ date }) => {
+  const d = new Date(date);
+  const now = new Date();
+
+  return d > now || show;
+}
+
+const sortFn = (a, b) => {
+  const ad = new Date(a.date)
+  const bd = new Date(b.date)
+
+  return bd - ad
+}
+
 const HomeContent = () => {
+  const [showAll, setShowAll] = React.useState(false);
   const { data, loading } = useFetch(`${process.env.REACT_APP_ENDPOINT}/rest/tables`, []);
-  const { user_id, email } = useEmail();
 
   if (loading) {
     return <>Loading...</>
   }
 
-  if (data === undefined || user_id === null || email === null) {
+  if (data === undefined) {
     return <></>
   }
 
-  return <Home data={data} user_id={user_id} email={email} />
-}
-
-const Home = ({ data, user_id, email }) => {
   return (
     <Grid container spacing={2}>
-      {data !== undefined && data.map((d, i) => (
+      <Grid item xs={12}>
+        <Box display="flex" justifyContent="flex-end">
+          <FormControlLabel
+            control={
+              <Checkbox
+                size="small"
+                checked={showAll}
+                onChange={(event) => setShowAll(event.target.checked)}
+              />
+            }
+            label="Show Archived"
+          />
+        </Box>
+      </Grid>
+      {data !== undefined && data.filter(dateFilter(showAll)).sort(sortFn).map((d, i) => (
         <Grid key={i} item xs={12}>
-          <Join data={d} user_id={user_id} email={email} />
+          <Join data={d} />
         </Grid>
       ))}
+      <Grid item xs={12}>
+        <Box display="flex" justifyContent="flex-end">
+          <Button component={Link} variant="contained" to="/create">Create</Button>
+        </Box>
+      </Grid>
     </Grid>
   );
 }
