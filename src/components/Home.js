@@ -3,6 +3,7 @@ import { Grid, Checkbox, FormControlLabel, Button, Box } from '@mui/material';
 import { Link } from "react-router-dom";
 import { Join } from './Join';
 import { useFetch } from '../hooks/useFetch';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 const dateFilter = show => ({ date }) => {
   const d = new Date(date);
@@ -21,6 +22,7 @@ const sortFn = (a, b) => {
 const HomeContent = () => {
   const [showAll, setShowAll] = React.useState(false);
   const { data, loading } = useFetch(`${process.env.REACT_APP_ENDPOINT}/rest/tables`, []);
+  const matches = useMediaQuery((theme) => theme.breakpoints.up('sm'));
 
   if (loading) {
     return <>Loading...</>
@@ -51,11 +53,11 @@ const HomeContent = () => {
           <Join data={d} />
         </Grid>
       ))}
-      <Grid item xs={12}>
+      { matches && <Grid item xs={12}>
         <Box display="flex" justifyContent="flex-end">
           <Button component={Link} variant="contained" color="secondary" to="/create">Create</Button>
         </Box>
-      </Grid>
+      </Grid>}
     </Grid>
   );
 }

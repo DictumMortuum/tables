@@ -162,36 +162,35 @@ const TableContainer = props => {
       <Box sx={{ display: 'flex', flexDirection: 'column', width: left_width }}>
         <CardContent>
           <List>
-            <ListItem>
+            { nameElement && <ListItem>
               <ListItemIcon>
                 <Avatar
                   component={id === undefined ? "div" : Link}
                   to={`/show/${id}`}
-                  alt="Remy Sharp"
                   src={boardgame.square200 || "https://placehold.co/200x200"}
                 />
               </ListItemIcon>
               {nameElement}
-            </ListItem>
+            </ListItem> }
             { addToCalendarElement !== undefined && !archive && <ListItem>
               {addToCalendarElement}
             </ListItem>}
-            <ListItem>
+            { dateElement !== undefined && <ListItem>
               <ListItemIcon>
                 <Avatar>
                   <EventIcon />
                 </Avatar>
               </ListItemIcon>
               {dateElement}
-            </ListItem>
-            <ListItem>
+            </ListItem> }
+            { locationElement !== undefined && <ListItem>
               <ListItemIcon>
                 <Avatar>
                   <LocationOnIcon />
                 </Avatar>
               </ListItemIcon>
               {locationElement}
-            </ListItem>
+            </ListItem> }
             {creatorElement !== undefined && <ListItem>
               <ListItemIcon>
                 <Avatar>

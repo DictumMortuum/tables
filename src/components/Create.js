@@ -1,36 +1,48 @@
 import React from 'react';
-import { Box, TextField, Button, ListItem, ListItemIcon, Avatar } from '@mui/material';
+import { Box, TextField, Button, ListItem, ListItemIcon, Avatar, Grid } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { useDebounce } from '@uidotdev/usehooks';
-import { createParticipant, createTable, getBoardgame } from './api';
+import { createParticipant, createTable, searchBoardgame } from './api';
 import { TableContainer } from './Table';
 import { useEmail } from '../hooks/useEmail';
 import { useNavigate } from "react-router-dom";
 import EventIcon from '@mui/icons-material/Event';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 
 const BoardgameField = ({ setBoardgame }) => {
   const [searchTerm, setSearchTerm] = React.useState("");
-  const [label, setLabel] = React.useState("Boardgame Id")
+  const [label, setLabel] = React.useState("Boardgame")
   const [isSearching, setIsSearching] = React.useState(false);
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const [results, setResults] = React.useState([]);
+  const [result, setResult] = React.useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 1000);
 
   const handleChange = (e) => {
     setSearchTerm(e.target.value);
   };
+
+  const handleDropdown = (e) => {
+    setResult(e.target.value);
+    const rs = results.filter(d => d.id === e.target.value);
+
+    console.log(rs, result, results);
+
+    if (rs.length === 1) {
+      setBoardgame(rs[0]);
+      setLabel(rs[0].name);
+    }
+  }
 
   React.useEffect(() => {
     const submit = async () => {
       setIsSearching(true);
 
       if (debouncedSearchTerm) {
-        const { errors, ...rest } = await getBoardgame(debouncedSearchTerm);
-
-        if (errors === undefined) {
-          setBoardgame(rest);
-          setLabel(rest.name);
-        } else {
-          setLabel("Not Found");
-        }
+        const rs = await searchBoardgame(debouncedSearchTerm);
+        setResults(rs);
       }
 
       setIsSearching(false);
@@ -40,13 +52,33 @@ const BoardgameField = ({ setBoardgame }) => {
   }, [debouncedSearchTerm, setBoardgame]);
 
   return (
-    <TextField
-      label={label}
-      fullWidth
-      value={searchTerm}
-      onChange={handleChange}
-      disabled={isSearching}
-    />
+    <Grid container spacing={1}>
+      <Grid item xs={12}>
+        <TextField
+          label={label}
+          value={searchTerm}
+          onChange={handleChange}
+          disabled={isSearching}
+          fullWidth
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <FormControl fullWidth>
+          <InputLabel>{results.length} results</InputLabel>
+          <Select
+            value={result}
+            label="Boardgame"
+            onChange={handleDropdown}
+            disabled={isSearching}
+            autoWidth
+          >
+            {results.map(d => (
+              <MenuItem key={d.id} value={d.id}>{d.name}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+    </Grid>
   );
 }
 
