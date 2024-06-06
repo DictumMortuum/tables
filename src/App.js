@@ -24,6 +24,9 @@ import TableBarIcon from '@mui/icons-material/TableBar';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AddIcon from '@mui/icons-material/Add';
+import Drawer from './components/Drawer';
+import MenuIcon from '@mui/icons-material/Menu';
+import IconButton from '@mui/material/IconButton';
 import { useLocation } from 'react-router-dom';
 
 const StyledFab = styled(Fab)({
@@ -38,6 +41,7 @@ const StyledFab = styled(Fab)({
 const Layout = () => {
   const matches = useMediaQuery((theme) => theme.breakpoints.up('sm'));
   const [value, setValue] = React.useState(0);
+  const [state, setState] = React.useState(false);
   const { email } = useEmail();
   const { pathname } = useLocation();
 
@@ -55,6 +59,7 @@ const Layout = () => {
     return (
       <Stack direction="column" sx={{ height: "100%" }}>
         <Outlet />
+        <Drawer state={state} setState={setState} />
         <AppBar position="fixed" color="primary" sx={{ top: 'auto', bottom: 0 }}>
           {pathname === "/" && <StyledFab color="secondary" aria-label="add" component={Link} to="/create">
             <AddIcon  sx={{ color: "white"}} />
@@ -66,6 +71,7 @@ const Layout = () => {
               setValue(newValue);
             }}
           >
+            <BottomNavigationAction label="Menu" onClick={() => { setState(true) }} icon={<MenuIcon />} />
             <BottomNavigationAction component={Link} to="/" label="Tables" icon={<TableBarIcon />} />
             <BottomNavigationAction component={Link} to="/eurovision" label="Eurovision" icon={<EmojiEventsIcon />} />
             <BottomNavigationAction label={splitted} icon={<LogoutIcon />} onClick={onLogout} />
@@ -79,14 +85,16 @@ const Layout = () => {
     <Stack direction="column" sx={{ height: "100%" }}>
       <Container sx={{ marginBottom: 2 }}>
         <Stack direction="row" spacing={2} mt={1}>
-          <Button component={Link} to="/">Tables</Button>
-          <Button component={Link} to="/eurovision">Eurovision</Button>
+          <IconButton onClick={() => { setState(true) }}>
+            <MenuIcon />
+          </IconButton>
           {email !== null &&
             <div style={{ marginLeft: "auto" }}>
               {splitted} <Button onClick={onLogout}>Logout</Button>
             </div>
           }
         </Stack>
+        <Drawer state={state} setState={setState} />
         <Outlet />
       </Container>
       <Footer />
