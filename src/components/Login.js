@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material';
 import React from 'react';
-import Login, { authProvider} from 'servus-react-login';
+import Login, { authProvider } from 'servus-react-login';
 
 const notify = props => {
   console.log(props);

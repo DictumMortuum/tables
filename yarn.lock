@@ -9808,10 +9808,10 @@ serve-static@1.15.0:
     parseurl "~1.3.3"
     send "0.18.0"
 
-servus-react-login@^1.0.8:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/servus-react-login/-/servus-react-login-1.0.8.tgz#27ec4b1cf6def9ed0d93ee10f475e47f909a2a5a"
-  integrity sha512-ZzTP7+bq21ofQrf8hXaFmhFn2rLXjiRheVdHDnFKVXGDQ8ZrfcJo1D8YpgpB7Vrv0ftDcdUL4NI+PuiM9yM9GA==
+servus-react-login@^1.0.11:
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/servus-react-login/-/servus-react-login-1.0.11.tgz#57d71290ee17a051f854724d4f6ecc408fced07a"
+  integrity sha512-9HpgtioEz0ZdR15fmzsqveM2TsKbEqgDO0fL0aW5zpP0saZZPxWdetIUmW+nLObyetO40Xso+yCsktJpWHLufg==
   dependencies:
     "@babel/cli" "^7.24.6"
     "@babel/preset-env" "^7.24.6"
