@@ -1,13 +1,16 @@
 import { Typography } from '@mui/material';
 import React from 'react';
 import Login, { authProvider } from 'servus-react-login';
-
-const notify = props => {
-  console.log(props);
-}
+import { UserContext } from '../context';
 
 const Component = () => {
   const { checkAuth, login, signup, resetPassword } = authProvider;
+  const { setOpen, setMsg } = React.useContext(UserContext);
+
+  const notify = props => {
+    setOpen(true);
+    setMsg(props);
+  }
 
   return (
     <>

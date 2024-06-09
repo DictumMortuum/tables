@@ -27,3 +27,8 @@ export const createEurovisionParticipation = payload => fetch(`${process.env.REA
   method: "POST",
   body: JSON.stringify(payload)
 }).then(res => res.json());
+
+export const createEurovisionVotes = payload => fetch(`${process.env.REACT_APP_ENDPOINT}/rest/eurovisionvotes`, {
+  method: "POST",
+  body: JSON.stringify(payload)
+}).then(res => res.json());

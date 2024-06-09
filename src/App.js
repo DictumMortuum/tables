@@ -27,6 +27,7 @@ import AddIcon from '@mui/icons-material/Add';
 import Drawer from './components/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
 import IconButton from '@mui/material/IconButton';
+import Snackbar from './components/Snackbar';
 import { useLocation } from 'react-router-dom';
 
 const StyledFab = styled(Fab)({
@@ -77,6 +78,7 @@ const Layout = () => {
             <BottomNavigationAction label={splitted} icon={<LogoutIcon />} onClick={onLogout} />
           </BottomNavigation>
         </AppBar>
+        <Snackbar />
       </Stack>
     )
   }
@@ -98,6 +100,7 @@ const Layout = () => {
         <Outlet />
       </Container>
       <Footer />
+      <Snackbar />
     </Stack>
   );
 }

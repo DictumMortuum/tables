@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, TextField, Button, Grid, Avatar, IconButton, Card, CardMedia, CardActions, CardHeader } from '@mui/material';
+import { Box, TextField, Button, Grid, Avatar, IconButton, Card, CardMedia, CardHeader } from '@mui/material';
 import { useDebounce } from '@uidotdev/usehooks';
 import { createEurovisionParticipation, searchBoardgame } from '../api';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -10,6 +10,7 @@ import Select from '@mui/material/Select';
 import Collapse from '@mui/material/Collapse';
 import { styled } from '@mui/material/styles';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { UserContext } from '../../context';
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -37,8 +38,6 @@ const BoardgameField = ({ setBoardgame }) => {
   const handleDropdown = (e) => {
     setResult(e.target.value);
     const rs = results.filter(d => d.id === e.target.value);
-
-    console.log(rs, result, results);
 
     if (rs.length === 1) {
       setBoardgame(rs[0]);
@@ -92,13 +91,14 @@ const BoardgameField = ({ setBoardgame }) => {
   );
 }
 
-const CreateButton = ({ user_id, boardgame, exists, setShowAll }) => {
+const CreateButton = ({ user_id, email, boardgame, exists, setShowAll }) => {
   const [isSearching, setIsSearching] = React.useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { setMsg, setOpen } = React.useContext(UserContext);
 
   const onClick = async () => {
-    if (!user_id) {
+    if (!user_id || !email) {
       localStorage.setItem("redirectURL", pathname);
       navigate("/auth/login")
       return
@@ -108,10 +108,16 @@ const CreateButton = ({ user_id, boardgame, exists, setShowAll }) => {
 
     await createEurovisionParticipation({
       boardgame_id: boardgame.id,
-      user_id: user_id,
+      user_id,
+      email,
     }).catch(err => {
       console.log(err);
-    })
+    }).then(() => {
+      setMsg("Your participation was saved successfully.");
+      setOpen(true);
+    });
+
+    window.location.reload();
 
     setShowAll(false);
     setIsSearching(false);
@@ -129,7 +135,7 @@ const CreateButton = ({ user_id, boardgame, exists, setShowAll }) => {
   );
 }
 
-const Create = ({ user_id, data, exists }) => {
+const Create = ({ user_id, email, data, exists }) => {
   const [boardgame, setBoardgame] = React.useState(data);
   const [showAll, setShowAll] = React.useState(!exists);
 
@@ -138,39 +144,36 @@ const Create = ({ user_id, data, exists }) => {
   };
 
   return (
-    <Grid container spacing={2} mt={1}>
-      <Grid item xs={12}>
-        <Box display="flex" justifyContent="center" alignItems="center">
-          <Card sx={{ width: 300 }}>
-            <CardHeader
-              subheader={boardgame.name}
-              avatar={
-                <Avatar src={boardgame.square200 || "https://placehold.co/200x200"} />
-              }
-            />
-            <CardMedia
-              component="img"
-              image={boardgame.square200 || "https://placehold.co/200"}
-            />
-            <CardActions>
-              Change selection:
-              <ExpandMore expand={showAll} onClick={handleExpandClick}>
-                <ExpandMoreIcon />
-              </ExpandMore>
-            </CardActions>
-            <Collapse in={showAll} timeout="auto" unmountOnExit>
-              <BoardgameField setBoardgame={setBoardgame} />
-              <CreateButton
-                user_id={user_id}
-                boardgame={boardgame}
-                exists={exists}
-                setShowAll={setShowAll}
-              />
-            </Collapse>
-          </Card>
-        </Box>
-      </Grid>
-    </Grid>
+    <Box display="flex" justifyContent="center" alignItems="center">
+      <Card sx={{ width: 300, padding: 1 }}>
+        <CardHeader
+          subheader={boardgame.name}
+          avatar={
+            <Avatar src={boardgame.square200 || "https://placehold.co/200x200"} />
+          }
+          action={
+            <ExpandMore expand={showAll} onClick={handleExpandClick}>
+              <ExpandMoreIcon />
+            </ExpandMore>
+          }
+        />
+        <Collapse in={showAll} timeout="auto" unmountOnExit>
+          <CardMedia
+            component="img"
+            image={boardgame.square200 || "https://placehold.co/200"}
+            sx={{ marginBottom: 2 }}
+          />
+          <BoardgameField setBoardgame={setBoardgame} />
+          <CreateButton
+            user_id={user_id}
+            boardgame={boardgame}
+            email={email}
+            exists={exists}
+            setShowAll={setShowAll}
+          />
+        </Collapse>
+      </Card>
+    </Box>
   );
 }
 
