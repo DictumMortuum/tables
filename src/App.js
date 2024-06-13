@@ -63,7 +63,7 @@ const Layout = () => {
         <Drawer state={state} setState={setState} />
         <AppBar position="fixed" color="primary" sx={{ top: 'auto', bottom: 0 }}>
           {pathname === "/" && <StyledFab color="secondary" aria-label="add" component={Link} to="/create">
-            <AddIcon  sx={{ color: "white"}} />
+            <AddIcon sx={{ color: "white"}} />
           </StyledFab>}
           <BottomNavigation
             showLabels

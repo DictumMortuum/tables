@@ -22,7 +22,7 @@ const Component = ({ items, user_id, email }) => {
 
   return (
     <Box display="flex" justifyContent="flex-end">
-      <Button variant="contained" onClick={handleClick}>Save</Button>
+      <Button variant="contained" onClick={handleClick} sx={{ marginRight: 2 }}>Save</Button>
     </Box>
   );
 }

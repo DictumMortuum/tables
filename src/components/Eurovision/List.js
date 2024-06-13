@@ -13,7 +13,6 @@ import {
   Avatar
 } from '@mui/material';
 import ReorderIcon from '@mui/icons-material/Reorder';
-import Save from './Save';
 
 const votes = [12, 10, 8, 7, 6, 5, 4, 3, 2, 1]
 
@@ -53,9 +52,7 @@ const DraggableListItem = ({ item, index }) => {
   );
 };
 
-const DraggableList = React.memo(({ items, user_id, email }) => {
-  const [list, setList] = React.useState(items);
-
+const DraggableList = React.memo(({ list, setList }) => {
   const onDragEnd = ({ destination, source }) => {
     if (!destination) {
       return
@@ -66,21 +63,18 @@ const DraggableList = React.memo(({ items, user_id, email }) => {
   };
 
   return (
-    <>
-      <Save items={list} user_id={user_id} email={email} />
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="droppable-list">
-          {provided => (
-            <div ref={provided.innerRef} {...provided.droppableProps}>
-              {list.map((item, index) => (
-                <DraggableListItem item={item} index={index} key={item.id} />
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
-    </>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Droppable droppableId="droppable-list">
+        {provided => (
+          <div ref={provided.innerRef} {...provided.droppableProps}>
+            {list.map((item, index) => (
+              <DraggableListItem item={item} index={index} key={item.id} />
+            ))}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
   );
 });
 
