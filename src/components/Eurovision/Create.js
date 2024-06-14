@@ -11,6 +11,8 @@ import Collapse from '@mui/material/Collapse';
 import { styled } from '@mui/material/styles';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { UserContext } from '../../context';
+import { useEmail } from '../../hooks/useEmail';
+import { useFetch } from '../../hooks/useFetch';
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -91,14 +93,19 @@ const BoardgameField = ({ setBoardgame }) => {
   );
 }
 
-const CreateButton = ({ user_id, email, boardgame, exists, setShowAll }) => {
+const CreateButton = ({ boardgame, exists, setShowAll }) => {
+  const { user_id, email, loading } = useEmail();
   const [isSearching, setIsSearching] = React.useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { setMsg, setOpen } = React.useContext(UserContext);
 
   const onClick = async () => {
-    if (!user_id || !email) {
+    if (loading) {
+      return
+    }
+
+    if (!user_id || !email || loading) {
       localStorage.setItem("redirectURL", pathname);
       navigate("/auth/login")
       return
@@ -135,7 +142,41 @@ const CreateButton = ({ user_id, email, boardgame, exists, setShowAll }) => {
   );
 }
 
-const Create = ({ user_id, email, data, exists }) => {
+const CreateUserContainer = () => {
+  const { loading, user_id } = useEmail();
+
+  if (loading) {
+    return <>Loading...</>;
+  }
+
+  if (user_id === null) {
+    return <Create exists={true} data={{}} />
+  }
+
+  return <CreateContainer user_id={user_id} />
+}
+
+const CreateContainer = ({ user_id }) => {
+  const { loading, data } = useFetch(`${process.env.REACT_APP_ENDPOINT}/rest/eurovisionparticipations/user/${user_id}`, undefined)
+
+  if (loading) {
+    return <>Loading...</>;
+  }
+
+  if (data === undefined) {
+    return <></>;
+  }
+
+  const { errors } = data;
+
+  if (errors !== undefined) {
+    return <></>
+  }
+
+  return <Create exists={true} data={data.boardgame} />
+}
+
+const Create = ({ data, exists }) => {
   const [boardgame, setBoardgame] = React.useState(data);
   const [showAll, setShowAll] = React.useState(!exists);
 
@@ -165,9 +206,7 @@ const Create = ({ user_id, email, data, exists }) => {
           />
           <BoardgameField setBoardgame={setBoardgame} />
           <CreateButton
-            user_id={user_id}
             boardgame={boardgame}
-            email={email}
             exists={exists}
             setShowAll={setShowAll}
           />
@@ -177,4 +216,4 @@ const Create = ({ user_id, email, data, exists }) => {
   );
 }
 
-export default Create;
+export default CreateUserContainer;

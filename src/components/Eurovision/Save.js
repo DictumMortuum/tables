@@ -1,9 +1,11 @@
 import React from 'react';
 import { Box, Button } from '@mui/material';
 import { createEurovisionVotes } from '../api';
+import { useEmail } from '../../hooks/useEmail';
 import { UserContext } from '../../context';
 
-const Component = ({ items, user_id, email }) => {
+const Component = ({ items }) => {
+  const { user_id, email, loading } = useEmail();
   const { setMsg, setOpen } = React.useContext(UserContext);
 
   const handleClick = async () => {
@@ -22,7 +24,7 @@ const Component = ({ items, user_id, email }) => {
 
   return (
     <Box display="flex" justifyContent="flex-end">
-      <Button variant="contained" onClick={handleClick} sx={{ marginRight: 2 }}>Save</Button>
+      <Button variant="contained" onClick={handleClick} disabled={loading} sx={{ marginRight: 2 }}>Save</Button>
     </Box>
   );
 }

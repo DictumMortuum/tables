@@ -36,3 +36,7 @@ export const createEurovisionVotes = payload => fetch(`${process.env.REACT_APP_E
 export const getEurovisionVotes = user_id => fetch(`${process.env.REACT_APP_ENDPOINT}/rest/eurovisionvotes/user/${user_id}`, {
   method: "GET"
 }).then(res => res.json());
+
+export const getEurovisionParticipation = user_id => fetch(`${process.env.REACT_APP_ENDPOINT}/rest/eurovisionparticipations/user/${user_id}`, {
+  method: "GET"
+}).then(res => res.json());

@@ -12,6 +12,7 @@ export const useEmail = () => {
       setUserId(id);
       setLoading(false);
     }).catch(err => {
+      setLoading(false);
       console.log(err)
     })
   }, [email, setEmail, user_id, setUserId, setLoading])
