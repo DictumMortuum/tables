@@ -13,14 +13,10 @@ const User = () => {
     return <>Loading...</>;
   }
 
-  if (user_id === null) {
-    return <EurovisionContainer />
-  }
-
-  return <EurovisionUserContainer user_id={user_id} />
+  return <EurovisionContainer user_id={user_id} />
 }
 
-const EurovisionContainer = () => {
+const EurovisionContainer = ({ user_id }) => {
   const { loading, data } = useFetch(`${process.env.REACT_APP_ENDPOINT}/rest/eurovisionparticipations`, undefined)
 
   if (loading) {
@@ -31,10 +27,14 @@ const EurovisionContainer = () => {
     return <></>;
   }
 
+  if (user_id !== null) {
+    return <EurovisionUserContainer user_id={user_id} participations={data} />
+  }
+
   return <Eurovision data={data} />
 }
 
-const EurovisionUserContainer = ({ user_id }) => {
+const EurovisionUserContainer = ({ participations, user_id }) => {
   const { loading, data } = useFetch(`${process.env.REACT_APP_ENDPOINT}/rest/eurovisionvotes/user/${user_id}`, undefined)
 
   if (loading) {
@@ -48,10 +48,12 @@ const EurovisionUserContainer = ({ user_id }) => {
   const { errors } = data;
 
   if (errors !== undefined) {
-    return <EurovisionContainer />
+    return <Eurovision data={participations} />
   }
 
-  return <Eurovision data={data.votes} />
+  const votes = data.votes.map(d => d.id);
+  const newvotes = [...data.votes, ...participations.filter(d => !votes.includes(d.id))]
+  return <Eurovision data={newvotes} />
 }
 
 const Eurovision = ({ data }) => {
