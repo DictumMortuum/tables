@@ -170,7 +170,7 @@ const CreateContainer = ({ user_id }) => {
   const { errors } = data;
 
   if (errors !== undefined) {
-    return <></>
+    return <Create exists={true} data={{}} />
   }
 
   return <Create exists={true} data={data.boardgame} />

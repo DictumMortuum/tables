@@ -45,6 +45,12 @@ const EurovisionUserContainer = ({ user_id }) => {
     return <></>;
   }
 
+  const { errors } = data;
+
+  if (errors !== undefined) {
+    return <EurovisionContainer />
+  }
+
   return <Eurovision data={data.votes} />
 }
 
