@@ -31,7 +31,7 @@ const EurovisionContainer = ({ user_id }) => {
     return <EurovisionUserContainer user_id={user_id} participations={data} />
   }
 
-  return <Eurovision data={data} />
+  return <Eurovision data={data} exists={false} />
 }
 
 const EurovisionUserContainer = ({ participations, user_id }) => {
@@ -48,21 +48,21 @@ const EurovisionUserContainer = ({ participations, user_id }) => {
   const { errors } = data;
 
   if (errors !== undefined) {
-    return <Eurovision data={participations} />
+    return <Eurovision data={participations} exists={false} />
   }
 
   const votes = data.votes.map(d => d.id);
   const newvotes = [...data.votes, ...participations.filter(d => !votes.includes(d.id))]
-  return <Eurovision data={newvotes} />
+  return <Eurovision data={newvotes} exists={true} />
 }
 
-const Eurovision = ({ data }) => {
+const Eurovision = ({ data, exists }) => {
   const [list, setList] = React.useState(data);
 
   return (
     <Grid container spacing={2} mt={1}>
       <Grid item xs={12}>
-        <Create />
+        <Create exists={exists} />
       </Grid>
       <Grid item xs={12}>
         <Save items={list} />

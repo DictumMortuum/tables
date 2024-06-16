@@ -142,7 +142,7 @@ const CreateButton = ({ boardgame, exists, setShowAll }) => {
   );
 }
 
-const CreateUserContainer = () => {
+const CreateUserContainer = ({ exists }) => {
   const { loading, user_id } = useEmail();
 
   if (loading) {
@@ -150,13 +150,13 @@ const CreateUserContainer = () => {
   }
 
   if (user_id === null) {
-    return <Create exists={true} data={{}} />
+    return <Create exists={false} data={{}} />
   }
 
-  return <CreateContainer user_id={user_id} />
+  return <CreateContainer user_id={user_id} exists={exists} />
 }
 
-const CreateContainer = ({ user_id }) => {
+const CreateContainer = ({ user_id, exists }) => {
   const { loading, data } = useFetch(`${process.env.REACT_APP_ENDPOINT}/rest/eurovisionparticipations/user/${user_id}`, undefined)
 
   if (loading) {
@@ -170,10 +170,10 @@ const CreateContainer = ({ user_id }) => {
   const { errors } = data;
 
   if (errors !== undefined) {
-    return <Create exists={true} data={{}} />
+    return <Create exists={exists} data={{}} />
   }
 
-  return <Create exists={true} data={data.boardgame} />
+  return <Create exists={exists} data={data.boardgame} />
 }
 
 const Create = ({ data, exists }) => {
