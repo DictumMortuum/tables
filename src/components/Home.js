@@ -24,6 +24,12 @@ const HomeContent = () => {
   const { data, loading } = useFetch(`${process.env.REACT_APP_ENDPOINT}/rest/tables`, []);
   const matches = useMediaQuery((theme) => theme.breakpoints.up('sm'));
 
+  React.useEffect(() => {
+    if (data.filter(dateFilter(false)).length === 0) {
+      setShowAll(true);
+    }
+  }, [data])
+
   if (loading) {
     return <>Loading...</>
   }
