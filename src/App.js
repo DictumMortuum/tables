@@ -1,7 +1,7 @@
 import './App.css';
 import React from 'react';
 import { HashRouter, Routes, Route, Link, Outlet } from "react-router-dom";
-import { Container, Button, Stack } from '@mui/material';
+import { Container, Stack } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import Create from './components/Create';
@@ -9,6 +9,7 @@ import Home from './components/Home';
 import Join from './components/Join';
 import Login from './components/Login';
 import Eurovision from './components/Eurovision';
+import Profile from './components/Profile';
 import { authProvider, SessionAuth, Reset } from 'servus-react-login';
 import { UserProvider } from './context';
 import 'dayjs/locale/en-gb';
@@ -22,12 +23,15 @@ import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import TableBarIcon from '@mui/icons-material/TableBar';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AddIcon from '@mui/icons-material/Add';
 import Drawer from './components/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
 import IconButton from '@mui/material/IconButton';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Snackbar from './components/Snackbar';
+import Box from '@mui/material/Box';
 import { useLocation } from 'react-router-dom';
 
 const StyledFab = styled(Fab)({
@@ -72,10 +76,10 @@ const Layout = () => {
               setValue(newValue);
             }}
           >
-            <BottomNavigationAction label="Menu" onClick={() => { setState(true) }} icon={<MenuIcon />} />
-            <BottomNavigationAction component={Link} to="/" label="Tables" icon={<TableBarIcon />} />
-            <BottomNavigationAction component={Link} to="/eurovision" label="Eurovision" icon={<EmojiEventsIcon />} />
-            <BottomNavigationAction label={splitted} icon={<LogoutIcon />} onClick={onLogout} />
+            <BottomNavigationAction label="menu" onClick={() => { setState(true) }} icon={<MenuIcon />} />
+            <BottomNavigationAction label="profile" component={Link} to="/profile" icon={<AccountCircleIcon />} />
+            { email !== null && <BottomNavigationAction label="logout" icon={<LogoutIcon />} onClick={onLogout} />}
+            { email === null && <BottomNavigationAction label="login" component={Link} to="/auth/login" icon={<LoginIcon />} />}
           </BottomNavigation>
         </AppBar>
         <Snackbar />
@@ -90,9 +94,25 @@ const Layout = () => {
           <IconButton onClick={() => { setState(true) }}>
             <MenuIcon />
           </IconButton>
+          <IconButton component={Link} to="/">
+            <TableBarIcon />
+          </IconButton>
+          <IconButton component={Link} to="/eurovision">
+            <EmojiEventsIcon />
+          </IconButton>
           {email !== null &&
             <div style={{ marginLeft: "auto" }}>
-              {splitted} <Button onClick={onLogout}>Logout</Button>
+              <Box component={Link} to="/profile">{splitted}</Box>
+              <IconButton onClick={onLogout}>
+                <LogoutIcon />
+              </IconButton>
+            </div>
+          }
+          {email === null &&
+            <div style={{ marginLeft: "auto" }}>
+              <IconButton component={Link} to="/auth/login">
+                <LoginIcon />
+              </IconButton>
             </div>
           }
         </Stack>
@@ -141,6 +161,7 @@ const App = () => {
                 <Route path="/auth/reset-password" element={<Reset />} />
                 <Route path="/auth/login" element={<Login />} />
                 <Route path="/eurovision" element={<Eurovision />} />
+                <Route path="/profile" element={<Profile />} />
                 <Route path="/create" element={
                   <SessionAuth>
                     <Create />

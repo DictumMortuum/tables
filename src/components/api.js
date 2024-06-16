@@ -40,3 +40,8 @@ export const getEurovisionVotes = user_id => fetch(`${process.env.REACT_APP_ENDP
 export const getEurovisionParticipation = user_id => fetch(`${process.env.REACT_APP_ENDPOINT}/rest/eurovisionparticipations/user/${user_id}`, {
   method: "GET"
 }).then(res => res.json());
+
+export const updatePlayer = (id, payload) => fetch(`${process.env.REACT_APP_ENDPOINT}/rest/players/${id}`, {
+  method: "PUT",
+  body: JSON.stringify(payload)
+}).then(res => res.json());
