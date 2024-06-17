@@ -6,7 +6,7 @@ import CardActions from '@mui/material/CardActions';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { UserContext } from '../../context';
-import { updatePlayer } from '../api';
+import { updatePlayer, getPlayerWishlist } from '../api';
 
 const Update = ({ player, value }) => {
   const [isSearching, setIsSearching] = React.useState(false);
@@ -23,13 +23,14 @@ const Update = ({ player, value }) => {
     });
 
     const { errors } = rs;
-    if (errors === undefined) {
+    if (errors !== undefined) {
       setMsg("Something went wrong, please try again.");
+      setOpen(true);
+    } else {
+      setMsg("Your bgg username was saved successfully.");
       setOpen(true);
     }
 
-    setMsg("Your profile picture was saved successfully.");
-    setOpen(true);
     setIsSearching(false);
   };
 
@@ -38,9 +39,38 @@ const Update = ({ player, value }) => {
   );
 }
 
-const Fetch = () => {
+const Fetch = ({ value }) => {
+  const [isSearching, setIsSearching] = React.useState(false);
+  const { setMsg, setOpen } = React.useContext(UserContext);
+
+  const onClick = async () => {
+    if (value === "") {
+      setMsg("Please set a username first.");
+      setOpen(true);
+      return
+    }
+
+    setIsSearching(true);
+
+    const rs = await getPlayerWishlist(value).catch(err => {
+      setMsg("Something went wrong, please try again.");
+      setOpen(true);
+    });
+
+    const { errors, data } = rs;
+    if (errors !== undefined || data === null) {
+      setMsg("Something went wrong, please try again.");
+      setOpen(true);
+    } else {
+      setMsg("Synced collection successfully.");
+      setOpen(true);
+    }
+
+    setIsSearching(false);
+  };
+
   return (
-    <Button variant="contained" color="secondary">Fetch Wishlist</Button>
+    <Button variant="contained" color="secondary" disabled={isSearching} onClick={onClick}>Sync Collection</Button>
   );
 }
 
@@ -53,13 +83,13 @@ const Component = ({ email, player }) => {
 
   return (
     <Card>
-      <CardHeader title="Set Boardgamegeek Username" />
+      <CardHeader title="Set Boardgamegeek Username" subheader={`Current collection size: ${player.collection.length}`} />
       <CardContent>
         <TextField label="Bgg username" variant="outlined" value={value} onChange={handleChange} fullWidth />
       </CardContent>
       <CardActions>
         <Update email={email} value={value} player={player} />
-        <Fetch />
+        <Fetch value={value} />
       </CardActions>
     </Card>
   );

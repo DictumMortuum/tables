@@ -45,3 +45,7 @@ export const updatePlayer = (id, payload) => fetch(`${process.env.REACT_APP_ENDP
   method: "PUT",
   body: JSON.stringify(payload)
 }).then(res => res.json());
+
+export const getPlayerWishlist = user_id => fetch(`${process.env.REACT_APP_PLAYER_ENDPOINT}/player/wishlist/${user_id}`, {
+  method: "GET"
+}).then(res => res.json());

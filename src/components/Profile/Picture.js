@@ -23,13 +23,14 @@ const Update = ({ player, avatar }) => {
     });
 
     const { errors } = rs;
-    if (errors === undefined) {
+    if (errors !== undefined) {
       setMsg("Something went wrong, please try again.");
+      setOpen(true);
+    } else {
+      setMsg("Your profile picture was saved successfully.");
       setOpen(true);
     }
 
-    setMsg("Your profile picture was saved successfully.");
-    setOpen(true);
     setIsSearching(false);
   };
 
