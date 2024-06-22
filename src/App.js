@@ -33,6 +33,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Snackbar from './components/Snackbar';
 import Box from '@mui/material/Box';
 import { useLocation } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 const StyledFab = styled(Fab)({
   margin: 0,
@@ -150,7 +151,10 @@ const theme = createTheme({
 });
 
 const App = () => {
+  const [queryClient] = React.useState(() => new QueryClient())
+
   return (
+    <QueryClientProvider client={queryClient}>
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
       <ThemeProvider theme={theme}>
         <UserProvider>
@@ -174,6 +178,7 @@ const App = () => {
         </UserProvider>
       </ThemeProvider>
     </LocalizationProvider>
+    </QueryClientProvider>
   );
 }
 

@@ -1,18 +1,20 @@
 import React from 'react';
-import { Box, TextField, Button, Grid, Avatar, IconButton, Card, CardMedia, CardHeader } from '@mui/material';
-import { useDebounce } from '@uidotdev/usehooks';
-import { createEurovisionParticipation, searchBoardgame } from '../api';
+import { Box, Button, Avatar, IconButton, Card, CardMedia, CardHeader } from '@mui/material';
+import { createEurovisionParticipation } from '../api';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
 import Collapse from '@mui/material/Collapse';
 import { styled } from '@mui/material/styles';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { UserContext } from '../../context';
 import { useEmail } from '../../hooks/useEmail';
-import { useFetch } from '../../hooks/useFetch';
+import Search from './Search';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import Loading from '../Loading';
+
+const fetchUserParticipation = async ({ user_id }) => {
+  const rs = await fetch(`${process.env.REACT_APP_ENDPOINT}/rest/eurovisionparticipations/user/${user_id}`);
+  return rs.json();
+}
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -25,160 +27,80 @@ const ExpandMore = styled((props) => {
   }),
 }));
 
-const BoardgameField = ({ setBoardgame }) => {
-  const [searchTerm, setSearchTerm] = React.useState("");
-  const [label, setLabel] = React.useState("Boardgame")
-  const [isSearching, setIsSearching] = React.useState(false);
-  const [results, setResults] = React.useState([]);
-  const [result, setResult] = React.useState("");
-  const debouncedSearchTerm = useDebounce(searchTerm, 1000);
-
-  const handleChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const handleDropdown = (e) => {
-    setResult(e.target.value);
-    const rs = results.filter(d => d.id === e.target.value);
-
-    if (rs.length === 1) {
-      setBoardgame(rs[0]);
-      setLabel(rs[0].name);
-    }
-  }
-
-  React.useEffect(() => {
-    const submit = async () => {
-      setIsSearching(true);
-
-      if (debouncedSearchTerm) {
-        const rs = await searchBoardgame(debouncedSearchTerm);
-        setResults(rs);
-      }
-
-      setIsSearching(false);
-    };
-
-    submit();
-  }, [debouncedSearchTerm, setBoardgame]);
-
-  return (
-    <Grid container spacing={1}>
-      <Grid item xs={12}>
-        <TextField
-          label={label}
-          value={searchTerm}
-          onChange={handleChange}
-          disabled={isSearching}
-          fullWidth
-        />
-      </Grid>
-      <Grid item xs={12}>
-        <FormControl fullWidth>
-          <InputLabel>{results.length} results</InputLabel>
-          <Select
-            value={result}
-            label="Boardgame"
-            onChange={handleDropdown}
-            disabled={isSearching}
-            autoWidth
-          >
-            {results.map(d => (
-              <MenuItem key={d.id} value={d.id}>{d.name}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Grid>
-    </Grid>
-  );
-}
-
-const CreateButton = ({ boardgame, exists, setShowAll }) => {
-  const { user_id, email, loading } = useEmail();
-  const [isSearching, setIsSearching] = React.useState(false);
+const CreateButton = ({ boardgame, setShowAll }) => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient()
+  const { user_id, email } = useEmail();
   const { pathname } = useLocation();
   const { setMsg, setOpen } = React.useContext(UserContext);
 
+  const { isPending, status, mutate } = useMutation({
+    mutationFn: createEurovisionParticipation
+  });
+
+  React.useEffect(() => {
+    if (status === "error") {
+      console.log(status);
+    }
+
+    if (status === "success") {
+      setMsg("Your participation was saved successfully.");
+      setOpen(true);
+      setShowAll(false);
+      queryClient.invalidateQueries({ queryKey: ['participations'] });
+    }
+  }, [status, queryClient, setMsg, setOpen, setShowAll]);
+
   const onClick = async () => {
-    if (loading) {
-      return
-    }
-
-    if (!user_id || !email || loading) {
+    if (!user_id || !email) {
       localStorage.setItem("redirectURL", pathname);
-      navigate("/auth/login")
-      return
+      navigate("/auth/login");
+      return;
     }
 
-    setIsSearching(true);
-
-    await createEurovisionParticipation({
+    mutate({
       boardgame_id: boardgame.id,
       user_id,
       email,
-    }).catch(err => {
-      console.log(err);
-    }).then(() => {
-      setMsg("Your participation was saved successfully.");
-      setOpen(true);
     });
-
-    window.location.reload();
-
-    setShowAll(false);
-    setIsSearching(false);
   };
 
   return (
     <Button
       variant="contained"
-      disabled={isSearching}
+      disabled={isPending}
       onClick={onClick}
       fullWidth
     >
-      { exists ? "Update" : "Create" }
+      set participation
     </Button>
   );
 }
 
-const CreateUserContainer = ({ exists }) => {
-  const { loading, user_id } = useEmail();
+const CreateContainer = () => {
+  const { user_id } = useEmail();
 
-  if (loading) {
-    return <>Loading...</>;
+  const { data, isLoading } = useQuery({
+    queryKey: ["participation", user_id],
+    queryFn: () => fetchUserParticipation({ user_id }),
+    enabled: !!user_id,
+    initialData: { boardgame: {}},
+  });
+
+  if (isLoading) {
+    return <Loading />;
   }
 
-  if (user_id === null) {
-    return <Create exists={false} data={{}} />
-  }
-
-  return <CreateContainer user_id={user_id} exists={exists} />
-}
-
-const CreateContainer = ({ user_id, exists }) => {
-  const { loading, data } = useFetch(`${process.env.REACT_APP_ENDPOINT}/rest/eurovisionparticipations/user/${user_id}`, undefined)
-
-  if (loading) {
-    return <>Loading...</>;
-  }
-
-  if (data === undefined) {
-    return <></>;
-  }
-
-  const { errors } = data;
-
-  if (errors !== undefined) {
-    return <Create exists={exists} data={{}} />
-  }
-
-  return <Create exists={exists} data={data.boardgame} />
+  return <Create exists={!!user_id} data={data.boardgame} />
 }
 
 const Create = ({ data, exists }) => {
   const [boardgame, setBoardgame] = React.useState(data);
   const [showAll, setShowAll] = React.useState(!exists);
+
+  React.useEffect(() => {
+    setBoardgame(data);
+  }, [data]);
 
   const handleExpandClick = () => {
     setShowAll(!showAll);
@@ -204,7 +126,7 @@ const Create = ({ data, exists }) => {
             image={boardgame.square200 || "https://placehold.co/200"}
             sx={{ marginBottom: 2 }}
           />
-          <BoardgameField setBoardgame={setBoardgame} />
+          <Search setBoardgame={setBoardgame} />
           <CreateButton
             boardgame={boardgame}
             exists={exists}
@@ -216,4 +138,4 @@ const Create = ({ data, exists }) => {
   );
 }
 
-export default CreateUserContainer;
+export default CreateContainer;

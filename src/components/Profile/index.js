@@ -1,41 +1,36 @@
 import React from 'react';
 import { Grid } from '@mui/material';
-import { useFetch } from '../../hooks/useFetch';
 import { useEmail } from '../../hooks/useEmail';
 import Picture from './Picture';
 import BGG from './BGG';
+import { useQuery } from '@tanstack/react-query';
 
-const User = () => {
-  const { loading, user_id, email } = useEmail();
+const fetchPlayer = async ({ email }) => {
+  const rs = await fetch(`${process.env.REACT_APP_ENDPOINT}/rest/players/email/${email}`, {
+    headers: {
+      "SA": localStorage.getItem("st"),
+    }
+  });
+  return rs.json();
+}
 
-  if (loading) {
+const Container = () => {
+  const { email } = useEmail();
+
+  const { data, isLoading }= useQuery({
+    queryKey: ["player", email],
+    queryFn: () => fetchPlayer({ email }),
+    enabled: !!email,
+  });
+
+  if (isLoading) {
     return <>Loading...</>;
   }
 
-  return <UserContainer user_id={user_id} email={email} />
+  return <Component player={data} />
 }
 
-const UserContainer = ({ user_id, email }) => {
-  const { loading, data } = useFetch(`${process.env.REACT_APP_ENDPOINT}/rest/players/email/${email}`, undefined)
-
-  if (loading) {
-    return <>Loading...</>;
-  }
-
-  if (data === undefined) {
-    return <></>;
-  }
-
-  const { errors } = data;
-
-  if (errors !== undefined) {
-    return <></>
-  }
-
-  return <Component user_id={user_id} email={email} player={data} />
-}
-
-const Component = ({ user_id, email, player }) => {
+const Component = ({ player }) => {
   return (
     <Grid container spacing={2} mt={1}>
       <Grid item xs={12}>
@@ -48,4 +43,4 @@ const Component = ({ user_id, email, player }) => {
   );
 }
 
-export default User;
+export default Container;

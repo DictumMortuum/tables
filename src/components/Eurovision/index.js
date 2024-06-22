@@ -1,68 +1,76 @@
 import React from 'react';
 import Create from './Create';
-import { useFetch } from '../../hooks/useFetch';
 import List from './List';
 import Save from './Save';
 import { Grid } from '@mui/material';
+import { useQuery } from '@tanstack/react-query';
 import { useEmail } from '../../hooks/useEmail';
+import Loading from '../Loading';
 
-const User = () => {
-  const { loading, user_id } = useEmail();
+const fetchEurovisionParticipations = async () => {
+  const rs = await fetch(`${process.env.REACT_APP_ENDPOINT}/rest/eurovisionparticipations`, {
+    headers: {
+      "SA": localStorage.getItem("st"),
+    }
+  });
 
-  if (loading) {
-    return <>Loading...</>;
-  }
-
-  return <EurovisionContainer user_id={user_id} />
+  return rs.json();
 }
 
-const EurovisionContainer = ({ user_id }) => {
-  const { loading, data } = useFetch(`${process.env.REACT_APP_ENDPOINT}/rest/eurovisionparticipations`, undefined)
-
-  if (loading) {
-    return <>Loading...</>;
-  }
-
-  if (data === undefined) {
-    return <></>;
-  }
-
-  if (user_id !== null) {
-    return <EurovisionUserContainer user_id={user_id} participations={data} />
-  }
-
-  return <Eurovision data={data} exists={false} />
+const fetchEurovisionVotes = async ({ user_id }) => {
+  const rs = await fetch(`${process.env.REACT_APP_ENDPOINT}/rest/eurovisionvotes/user/${user_id}`, {
+    headers: {
+      "SA": localStorage.getItem("st"),
+    }
+  });
+  return rs.json();
 }
 
-const EurovisionUserContainer = ({ participations, user_id }) => {
-  const { loading, data } = useFetch(`${process.env.REACT_APP_ENDPOINT}/rest/eurovisionvotes/user/${user_id}`, undefined)
+const Container = () => {
+  const { user_id } = useEmail();
 
-  if (loading) {
-    return <>Loading...</>;
+  const participations = useQuery({
+    queryKey: ["participations"],
+    queryFn: fetchEurovisionParticipations,
+  });
+
+  const votes = useQuery({
+    queryKey: ["votes", user_id],
+    queryFn: () => fetchEurovisionVotes({ user_id }),
+    enabled: !!user_id,
+    initialData: { votes: [] },
+  });
+
+  if (votes.isLoading || participations.isLoading) {
+    return <Loading />;
   }
 
-  if (data === undefined) {
-    return <></>;
+  console.log(votes.data)
+
+  if (votes.data !== null) {
+    const temp = votes.data.votes.map(d => d.id);
+    const newvotes = [
+      ...votes.data.votes,
+      ...participations.data.filter(d => !temp.includes(d.id)),
+    ];
+
+    return <Eurovision user_id={user_id} votes={newvotes} />
+  } else {
+    return <Eurovision user_id={user_id} votes={participations.data} />
   }
-
-  const { errors } = data;
-
-  if (errors !== undefined) {
-    return <Eurovision data={participations} exists={false} />
-  }
-
-  const votes = data.votes.map(d => d.id);
-  const newvotes = [...data.votes, ...participations.filter(d => !votes.includes(d.id))]
-  return <Eurovision data={newvotes} exists={true} />
 }
 
-const Eurovision = ({ data, exists }) => {
-  const [list, setList] = React.useState(data);
+const Eurovision = ({ votes, user_id }) => {
+  const [list, setList] = React.useState(votes);
+
+  React.useEffect(() => {
+    setList(votes);
+  }, [votes]);
 
   return (
     <Grid container spacing={2} mt={1}>
       <Grid item xs={12}>
-        <Create exists={exists} />
+        <Create exists={!!user_id} />
       </Grid>
       <Grid item xs={12}>
         <Save items={list} />
@@ -74,7 +82,4 @@ const Eurovision = ({ data, exists }) => {
   );
 }
 
-export default User;
-export {
-  Create
-}
+export default Container;

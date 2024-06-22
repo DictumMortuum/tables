@@ -1,25 +1,27 @@
-import { useContext, useEffect } from 'react';
-import { UserContext } from '../context';
-import { authProvider } from 'servus-react-login';
-
 export const useEmail = () => {
-  const { email, setEmail, user_id, setUserId, loading, setLoading } = useContext(UserContext);
+  const raw = localStorage.getItem('auth');
+  const auth = JSON.parse(raw);
 
-  useEffect(() => {
-    authProvider.getIdentity().then(identity => {
-      const { user, id } = identity;
-      setEmail(user);
-      setUserId(id);
-      setLoading(false);
-    }).catch(err => {
-      setLoading(false);
-      // console.log(err)
-    })
-  }, [email, setEmail, user_id, setUserId, setLoading])
+  if (auth === null) {
+    return {
+      email: null,
+      user_id: null,
+    }
+  }
+
+  const { status } = auth;
+
+  if (status !== "OK") {
+    return {
+      email: null,
+      user_id: null,
+    }
+  }
+
+  const { user: { id, email }} = auth;
 
   return {
     email,
-    user_id,
-    loading
+    user_id: id,
   }
 }

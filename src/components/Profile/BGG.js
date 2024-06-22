@@ -7,70 +7,70 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { UserContext } from '../../context';
 import { updatePlayer, getPlayerWishlist } from '../api';
+import { useMutation } from '@tanstack/react-query';
 
 const Update = ({ player, value }) => {
-  const [isSearching, setIsSearching] = React.useState(false);
   const { setMsg, setOpen } = React.useContext(UserContext);
 
-  const onClick = async () => {
-    setIsSearching(true);
+  const { isPending, status, mutate } = useMutation({
+    mutationFn: updatePlayer
+  });
 
-    const rs = await updatePlayer(player.id, {
-      bgg_username: value,
-    }).catch(err => {
+  React.useEffect(() => {
+    if (status === "error") {
       setMsg("Something went wrong, please try again.");
-      setOpen(true);
-    });
-
-    const { errors } = rs;
-    if (errors !== undefined) {
-      setMsg("Something went wrong, please try again.");
-      setOpen(true);
-    } else {
-      setMsg("Your bgg username was saved successfully.");
       setOpen(true);
     }
 
-    setIsSearching(false);
-  };
+    if (status === "success") {
+      setMsg("Your bgg username was saved successfully.");
+      setOpen(true);
+    }
+  }, [status, setMsg, setOpen]);
+
+  const handleClick = async () => {
+    mutate({
+      id: player.id,
+      bgg_username: value,
+    });
+  }
 
   return (
-    <Button variant="contained" disabled={isSearching} onClick={onClick}>Save</Button>
+    <Button variant="contained" disabled={isPending} onClick={handleClick}>Save</Button>
   );
 }
 
 const Fetch = ({ value }) => {
-  const [isSearching, setIsSearching] = React.useState(false);
   const { setMsg, setOpen } = React.useContext(UserContext);
 
-  const onClick = async () => {
+  const { isPending, status, mutate } = useMutation({
+    mutationFn: getPlayerWishlist
+  });
+
+  React.useEffect(() => {
+    if (status === "error") {
+      setMsg("Something went wrong, please try again.");
+      setOpen(true);
+    }
+
+    if (status === "success") {
+      setMsg("Synced collection successfully.");
+      setOpen(true);
+    }
+  }, [status, setMsg, setOpen]);
+
+  const handleClick = async () => {
     if (value === "") {
       setMsg("Please set a username first.");
       setOpen(true);
       return
     }
 
-    setIsSearching(true);
-
-    const rs = await getPlayerWishlist(value).catch(err => {
-      setMsg("Something went wrong, please try again.");
-      setOpen(true);
-    });
-
-    const { errors, data } = rs;
-    if (errors !== undefined || data === null) {
-      setMsg("Something went wrong, please try again.");
-      setOpen(true);
-    } else {
-      setMsg("Synced collection successfully.");
-      setOpen(true);
-    }
-
-    setIsSearching(false);
-  };
+    mutate(value);
+  }
 
   return (
-    <Button variant="contained" color="secondary" disabled={isSearching} onClick={onClick}>Sync Collection</Button>
+    <Button variant="contained" color="secondary" disabled={isPending} onClick={handleClick}>Sync Collection</Button>
   );
 }
 

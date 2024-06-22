@@ -3,28 +3,39 @@ import { Box, Button } from '@mui/material';
 import { createEurovisionVotes } from '../api';
 import { useEmail } from '../../hooks/useEmail';
 import { UserContext } from '../../context';
+import { useMutation } from '@tanstack/react-query';
 
 const Component = ({ items }) => {
-  const { user_id, email, loading } = useEmail();
+  const { user_id, email } = useEmail();
   const { setMsg, setOpen } = React.useContext(UserContext);
 
+  const { isPending, status, mutate } = useMutation({
+    mutationFn: createEurovisionVotes
+  });
+
+  React.useEffect(() => {
+    if (status === "error") {
+      setMsg("There was an error saving your votes.");
+      setOpen(true);
+    }
+
+    if (status === "success") {
+      setMsg("Votes saved successfully.");
+      setOpen(true);
+    }
+  }, [status, setMsg, setOpen]);
+
   const handleClick = async () => {
-    createEurovisionVotes({
+    mutate({
       user_id,
       email,
       votes: items
-    }).then(() => {
-      setMsg("Votes saved successfully.");
-      setOpen(true);
-    }).catch(err => {
-      setMsg("There was an error saving your votes.");
-      setOpen(true);
     });
   }
 
   return (
     <Box display="flex" justifyContent="flex-end">
-      <Button variant="contained" onClick={handleClick} disabled={loading} sx={{ marginRight: 2 }}>Save</Button>
+      <Button variant="contained" onClick={handleClick} disabled={isPending} sx={{ marginRight: 2 }}>Save</Button>
     </Box>
   );
 }

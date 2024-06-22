@@ -2,8 +2,9 @@ import React from 'react';
 import { Grid, Checkbox, FormControlLabel, Button, Box } from '@mui/material';
 import { Link } from "react-router-dom";
 import { Join } from './Join';
-import { useFetch } from '../hooks/useFetch';
+import Loading from './Loading';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { useQuery } from '@tanstack/react-query';
 
 const dateFilter = show => ({ date }) => {
   const d = new Date(date);
@@ -19,23 +20,32 @@ const sortFn = (a, b) => {
   return bd - ad
 }
 
+const fetchTables = async () => {
+  const rs = await fetch(`${process.env.REACT_APP_ENDPOINT}/rest/tables`)
+  return rs.json();
+}
+
 const HomeContent = () => {
   const [showAll, setShowAll] = React.useState(false);
-  const { data, loading } = useFetch(`${process.env.REACT_APP_ENDPOINT}/rest/tables`, []);
   const matches = useMediaQuery((theme) => theme.breakpoints.up('sm'));
 
+  const { data, isLoading } = useQuery({
+    queryKey: ["tables"],
+    queryFn: fetchTables,
+  });
+
   React.useEffect(() => {
+    if (data === undefined) {
+      return;
+    }
+
     if (data.filter(dateFilter(false)).length === 0) {
       setShowAll(true);
     }
   }, [data])
 
-  if (loading) {
-    return <>Loading...</>
-  }
-
-  if (data === undefined) {
-    return <></>
+  if (isLoading) {
+    return <Loading />;
   }
 
   return (

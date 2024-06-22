@@ -30,7 +30,7 @@ const Item = props => {
     <List ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
       <ListItem>
         <ListItemAvatar sx={{ minWidth: 35 }}>
-          {votes[index] || ""}
+          {votes[index+20] || ""}
         </ListItemAvatar>
         <ListItemIcon>
           <Avatar variant="square" src={boardgame.square200 || "https://placehold.co/200x200"} />

@@ -7,35 +7,36 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { UserContext } from '../../context';
 import { updatePlayer } from '../api';
+import { useMutation } from '@tanstack/react-query';
 
 const Update = ({ player, avatar }) => {
-  const [isSearching, setIsSearching] = React.useState(false);
   const { setMsg, setOpen } = React.useContext(UserContext);
 
-  const onClick = async () => {
-    setIsSearching(true);
+  const { isPending, status, mutate } = useMutation({
+    mutationFn: updatePlayer
+  });
 
-    const rs = await updatePlayer(player.id, {
-      avatar
-    }).catch(err => {
+  React.useEffect(() => {
+    if (status === "error") {
       setMsg("Something went wrong, please try again.");
-      setOpen(true);
-    });
-
-    const { errors } = rs;
-    if (errors !== undefined) {
-      setMsg("Something went wrong, please try again.");
-      setOpen(true);
-    } else {
-      setMsg("Your profile picture was saved successfully.");
       setOpen(true);
     }
 
-    setIsSearching(false);
-  };
+    if (status === "success") {
+      setMsg("Your profile picture was saved successfully.");
+      setOpen(true);
+    }
+  }, [status, setMsg, setOpen]);
+
+  const handleClick = async () => {
+    mutate({
+      id: player.id,
+      avatar,
+    });
+  }
 
   return (
-    <Button variant="contained" disabled={isSearching} onClick={onClick}>Save</Button>
+    <Button variant="contained" disabled={isPending} onClick={handleClick}>Save</Button>
   );
 }
 

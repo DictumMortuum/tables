@@ -34,16 +34,25 @@ export const createEurovisionVotes = payload => fetch(`${process.env.REACT_APP_E
 }).then(res => res.json());
 
 export const getEurovisionVotes = user_id => fetch(`${process.env.REACT_APP_ENDPOINT}/rest/eurovisionvotes/user/${user_id}`, {
-  method: "GET"
+  method: "GET",
+  headers: {
+    "SA": localStorage.getItem("st"),
+  }
 }).then(res => res.json());
 
 export const getEurovisionParticipation = user_id => fetch(`${process.env.REACT_APP_ENDPOINT}/rest/eurovisionparticipations/user/${user_id}`, {
-  method: "GET"
+  method: "GET",
+  headers: {
+    "SA": localStorage.getItem("st"),
+  }
 }).then(res => res.json());
 
-export const updatePlayer = (id, payload) => fetch(`${process.env.REACT_APP_ENDPOINT}/rest/players/${id}`, {
+export const updatePlayer = ({ id, ...payload }) => fetch(`${process.env.REACT_APP_ENDPOINT}/rest/players/${id}`, {
   method: "PUT",
-  body: JSON.stringify(payload)
+  body: JSON.stringify(payload),
+  headers: {
+    "SA": localStorage.getItem("st"),
+  }
 }).then(res => res.json());
 
 export const getPlayerWishlist = user_id => fetch(`${process.env.REACT_APP_PLAYER_ENDPOINT}/player/wishlist/${user_id}`, {
