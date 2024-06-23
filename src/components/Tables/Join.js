@@ -2,11 +2,11 @@ import React, { useEffect } from 'react';
 import { Box, Button, Snackbar, Stack } from '@mui/material';
 import Table from './Table';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { createParticipant, deleteTable, removeParticipant } from './api';
-import { useEmail } from '../hooks/useEmail';
+import { createParticipant, deleteTable, removeParticipant } from '../api';
+import { useEmail } from '../../hooks/useEmail';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import { useFetch } from '../hooks/useFetch';
+import { useFetch } from '../../hooks/useFetch';
 
 const LeaveButton = ({ setJoined, participations, setParticipations, setError }) => {
   const [isSearching, setIsSearching] = React.useState(false);

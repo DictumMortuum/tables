@@ -2,7 +2,7 @@ import React from 'react';
 import { Grid, Checkbox, FormControlLabel, Button, Box } from '@mui/material';
 import { Link } from "react-router-dom";
 import { Join } from './Join';
-import Loading from './Loading';
+import Loading from '../Loading';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useQuery } from '@tanstack/react-query';
 
