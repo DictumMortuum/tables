@@ -11,6 +11,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import { SessionAuth } from 'servus-react-login';
 
 const BoardgameField = ({ setBoardgame }) => {
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -179,41 +180,43 @@ const Create = () => {
   const { email, user_id } = useEmail();
 
   return (
-    <Box>
-      <h2>Create Table</h2>
-      <TableContainer
-        boardgame={boardgame}
-        nameElement={
-          <BoardgameField setBoardgame={setBoardgame} />
-        }
-        participantsElement={
-          <ListItem>
-            <ListItemIcon>
-              <Avatar>
-                <EventIcon />
-              </Avatar>
-            </ListItemIcon>
-            <SeatsField setSeats={setSeats} />
-          </ListItem>
-        }
-        dateElement={
-          <DateField setDate={setDate} />
-        }
-        locationElement={
-          <LocationField location={location} setLocation={setLocation} />
-        }
-        buttonElement={
-          <CreateButton
-            user_id={user_id}
-            location={location}
-            date={date}
-            boardgame={boardgame}
-            seats={seats}
-            creator={email}
-          />
-        }
-      />
-    </Box>
+    <SessionAuth>
+      <Box>
+        <h2>Create Table</h2>
+        <TableContainer
+          boardgame={boardgame}
+          nameElement={
+            <BoardgameField setBoardgame={setBoardgame} />
+          }
+          participantsElement={
+            <ListItem>
+              <ListItemIcon>
+                <Avatar>
+                  <EventIcon />
+                </Avatar>
+              </ListItemIcon>
+              <SeatsField setSeats={setSeats} />
+            </ListItem>
+          }
+          dateElement={
+            <DateField setDate={setDate} />
+          }
+          locationElement={
+            <LocationField location={location} setLocation={setLocation} />
+          }
+          buttonElement={
+            <CreateButton
+              user_id={user_id}
+              location={location}
+              date={date}
+              boardgame={boardgame}
+              seats={seats}
+              creator={email}
+            />
+          }
+        />
+      </Box>
+    </SessionAuth>
   );
 }
 

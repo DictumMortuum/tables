@@ -43,6 +43,11 @@ const Drawer = ({ state, setState }) => {
               <ListItemText primary="Eurovision"  />
             </ListItemButton>
           </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton component={Link} to="/finder">
+              <ListItemText primary="Finder"  />
+            </ListItemButton>
+          </ListItem>
         </List>
       </Box>
     </SwipeableDrawer>

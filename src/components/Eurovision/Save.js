@@ -9,21 +9,17 @@ const Component = ({ items }) => {
   const { user_id, email } = useEmail();
   const { setMsg, setOpen } = React.useContext(UserContext);
 
-  const { isPending, status, mutate } = useMutation({
-    mutationFn: createEurovisionVotes
-  });
-
-  React.useEffect(() => {
-    if (status === "error") {
+  const { isPending, mutate } = useMutation({
+    mutationFn: createEurovisionVotes,
+    onSuccess: (data, variables, context) => {
+      setMsg("Votes saved successfully.");
+      setOpen(true);
+    },
+    onError: (error, variables, context) => {
       setMsg("There was an error saving your votes.");
       setOpen(true);
     }
-
-    if (status === "success") {
-      setMsg("Votes saved successfully.");
-      setOpen(true);
-    }
-  }, [status, setMsg, setOpen]);
+  });
 
   const handleClick = async () => {
     mutate({

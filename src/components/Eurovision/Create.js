@@ -29,27 +29,24 @@ const ExpandMore = styled((props) => {
 
 const CreateButton = ({ boardgame, setShowAll }) => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   const { user_id, email } = useEmail();
   const { pathname } = useLocation();
   const { setMsg, setOpen } = React.useContext(UserContext);
 
-  const { isPending, status, mutate } = useMutation({
-    mutationFn: createEurovisionParticipation
-  });
-
-  React.useEffect(() => {
-    if (status === "error") {
-      console.log(status);
-    }
-
-    if (status === "success") {
+  const { isPending, mutate } = useMutation({
+    mutationFn: createEurovisionParticipation,
+    onSuccess: (data, variables, context) => {
       setMsg("Your participation was saved successfully.");
       setOpen(true);
       setShowAll(false);
       queryClient.invalidateQueries({ queryKey: ['participations'] });
+    },
+    onError: (error, variables, context) => {
+      setMsg("Something went wrong, please try again.");
+      setOpen(true);
     }
-  }, [status, queryClient, setMsg, setOpen, setShowAll]);
+  });
 
   const onClick = async () => {
     if (!user_id || !email) {

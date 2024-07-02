@@ -12,21 +12,17 @@ import { useMutation } from '@tanstack/react-query';
 const Update = ({ player, avatar }) => {
   const { setMsg, setOpen } = React.useContext(UserContext);
 
-  const { isPending, status, mutate } = useMutation({
-    mutationFn: updatePlayer
-  });
-
-  React.useEffect(() => {
-    if (status === "error") {
+  const { isPending, mutate } = useMutation({
+    mutationFn: updatePlayer,
+    onSuccess: (data, variables, context) => {
+      setMsg("Your profile picture was saved successfully.");
+      setOpen(true);
+    },
+    onError: (error, variables, context) => {
       setMsg("Something went wrong, please try again.");
       setOpen(true);
     }
-
-    if (status === "success") {
-      setMsg("Your profile picture was saved successfully.");
-      setOpen(true);
-    }
-  }, [status, setMsg, setOpen]);
+  });
 
   const handleClick = async () => {
     mutate({

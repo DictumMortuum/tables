@@ -45,8 +45,6 @@ const Container = () => {
     return <Loading />;
   }
 
-  console.log(votes.data)
-
   if (votes.data !== null) {
     const temp = votes.data.votes.map(d => d.id);
     const newvotes = [

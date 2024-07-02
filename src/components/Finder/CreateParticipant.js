@@ -5,18 +5,39 @@ import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import Modal from '@mui/material/Modal';
 import { UserContext } from '../../context';
-import { updatePlayer, getPlayerWishlist } from '../api';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-const Update = ({ player, value }) => {
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  p: 4,
+};
+
+export const createFinderUser = (payload) => fetch(`${process.env.REACT_APP_ENDPOINT}/rest/finderusers`, {
+  method: "POST",
+  body: JSON.stringify(payload),
+}).then(res => res.json());
+
+export const getFinderWishlist = user_id => fetch(`${process.env.REACT_APP_PLAYER_ENDPOINT}/player/finderuser/${user_id}`, {
+  method: "GET"
+}).then(res => res.json());
+
+const Update = ({ value }) => {
   const { setMsg, setOpen } = React.useContext(UserContext);
+  const queryClient = useQueryClient();
 
   const { isPending, mutate } = useMutation({
-    mutationFn: updatePlayer,
+    mutationFn: createFinderUser,
     onSuccess: (data, variables, context) => {
-      setMsg("Your bgg username was saved successfully.");
+      setMsg("The bgg username was saved successfully.");
       setOpen(true);
+      queryClient.invalidateQueries({ queryKey: ['finder'] });
     },
     onError: (error, variables, context) => {
       setMsg("Something went wrong, please try again.");
@@ -24,10 +45,12 @@ const Update = ({ player, value }) => {
     }
   });
 
+  console.log(value)
+
   const handleClick = async () => {
     mutate({
-      id: player.id,
       bgg_username: value,
+      collection: {},
     });
   }
 
@@ -40,7 +63,7 @@ const Fetch = ({ value }) => {
   const { setMsg, setOpen } = React.useContext(UserContext);
 
   const { isPending, mutate } = useMutation({
-    mutationFn: getPlayerWishlist,
+    mutationFn: getFinderWishlist,
     onSuccess: (data, variables, context) => {
       if (data.data.length === 0) {
         setMsg("Something went wrong, please try again.");
@@ -71,24 +94,26 @@ const Fetch = ({ value }) => {
   );
 }
 
-const Component = ({ email, player }) => {
-  const [value, setValue] = React.useState(player.bgg_username);
+const Component = ({ open, setOpen }) => {
+  const [value, setValue] = React.useState("");
 
   const handleChange = event => {
     setValue(event.target.value);
   }
 
   return (
-    <Card>
-      <CardHeader title="Set Boardgamegeek Username" subheader={`Current collection size: ${player.collection.length}`} />
-      <CardContent>
-        <TextField label="Bgg username" variant="outlined" value={value} onChange={handleChange} fullWidth />
-      </CardContent>
-      <CardActions>
-        <Update email={email} value={value} player={player} />
-        <Fetch value={value} />
-      </CardActions>
-    </Card>
+    <Modal open={open} onClose={() => setOpen(false)}>
+      <Card sx={style}>
+        <CardHeader title="Set Boardgamegeek Username" />
+        <CardContent>
+          <TextField label="Bgg username" variant="outlined" value={value} onChange={handleChange} fullWidth />
+        </CardContent>
+        <CardActions>
+          <Update value={value} />
+          <Fetch value={value} />
+        </CardActions>
+      </Card>
+    </Modal>
   );
 }
 
