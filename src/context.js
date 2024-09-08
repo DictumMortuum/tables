@@ -9,8 +9,6 @@ const reducer = (state, action) => {
       const participants = state.participants;
       participants[id] = participant;
 
-      console.log("action", action);
-
       return {
         ...state,
         participants,

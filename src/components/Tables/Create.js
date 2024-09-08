@@ -29,8 +29,6 @@ const BoardgameField = ({ setBoardgame }) => {
     setResult(e.target.value);
     const rs = results.filter(d => d.id === e.target.value);
 
-    console.log(rs, result, results);
-
     if (rs.length === 1) {
       setBoardgame(rs[0]);
       setLabel(rs[0].name);
@@ -146,7 +144,6 @@ const CreateButton = ({ user_id, boardgame, location, date, seats, creator }) =>
       creator,
       seats: parseInt(seats),
     });
-    console.log(table);
 
     const participant = await createParticipant({
       table_id: table.id,
@@ -154,7 +151,6 @@ const CreateButton = ({ user_id, boardgame, location, date, seats, creator }) =>
       name: creator,
     });
     console.log(participant);
-
     setIsSearching(false);
 
     navigate("/")

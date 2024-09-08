@@ -28,11 +28,11 @@ const Component = ({ data, state: { players = 4, time = 120, coop = false, prior
       }
 
       if (g.Status.own !== "1") {
-        return
+        return null
       }
 
       if (g.user_rating === 0 && rated) {
-        return
+        return null
       }
 
       games[g.id].push(g);
@@ -112,7 +112,6 @@ const Component = ({ data, state: { players = 4, time = 120, coop = false, prior
 
     games[d].map(g => {
       if (g.user_rating !== 0) {
-        console.log(getPriority(priority, "user rating"))
         cost += (10.0 - g.user_rating) * getPriority(priority, "user rating") / games[d].length;
       }
 
@@ -128,8 +127,6 @@ const Component = ({ data, state: { players = 4, time = 120, coop = false, prior
 
     return d;
   });
-
-  console.log(rs.length);
 
   rs.sort((a, b) => a.cost - b.cost);
 

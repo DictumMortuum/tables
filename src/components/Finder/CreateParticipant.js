@@ -45,8 +45,6 @@ const Update = ({ value }) => {
     }
   });
 
-  console.log(value)
-
   const handleClick = async () => {
     mutate({
       bgg_username: value,
