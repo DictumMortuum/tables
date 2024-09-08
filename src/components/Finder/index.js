@@ -30,6 +30,10 @@ const Component = () => {
     dispatch({ type: "coop", coop: event.target.checked });
   }
 
+  const handleRated = (event) => {
+    dispatch({ type: "rated", rated: event.target.checked });
+  }
+
   const handlePriorities = (items) => {
     dispatch({ type: "priority", priority: items });
   }
@@ -79,6 +83,15 @@ const Component = () => {
               <Checkbox
                 checked={state.coop}
                 onChange={handleCoop}
+              />
+            }
+          />
+          <FormControlLabel
+            label="Rated"
+            control={
+              <Checkbox
+                checked={state.rated}
+                onChange={handleRated}
               />
             }
           />

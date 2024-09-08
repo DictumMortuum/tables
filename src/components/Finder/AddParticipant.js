@@ -36,7 +36,7 @@ const Component = ({ id, dispatch, participant }) => {
     queryFn: fetchPlayersWithCollection,
   });
 
-  const { data, status, isLoading } = useQuery({
+  const { data, status } = useQuery({
     queryKey: ["collection", value],
     queryFn: () => fetchCollection(value),
     enabled: value !== "",
@@ -49,7 +49,6 @@ const Component = ({ id, dispatch, participant }) => {
   }, [participant]);
 
   React.useEffect(() => {
-    console.log("loading", status, isLoading, data);
     if (status === "success") {
       dispatch({
         type: "add",
@@ -57,7 +56,7 @@ const Component = ({ id, dispatch, participant }) => {
         participant: data,
       });
     }
-  }, [isLoading, dispatch, id, data, status])
+  }, [dispatch, id, data, status])
 
   if (users.isLoading) {
     return <Loading />;

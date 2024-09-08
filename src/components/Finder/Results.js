@@ -8,17 +8,15 @@ const getPriority = (col, name) => {
 
   if (i >= 0) {
     // console.log((p.length - i) * 0.1, name)
-    return (1 + p.length - i) * 0.1;
+    return (p.length - i) * 0.1;
   }
 
   return 0;
 }
 
-const Component = ({ data, state: { players = 4, time = 120, coop = false, priority } }) => {
+const Component = ({ data, state: { players = 4, time = 120, coop = false, priority, rated } }) => {
   const games = {};
   const rs = [];
-
-  console.log("here", data);
 
   // fill the games object with data.
   Object.keys(data).map(d => {
@@ -29,10 +27,15 @@ const Component = ({ data, state: { players = 4, time = 120, coop = false, prior
         games[g.id] = [];
       }
 
-      if (g.Status.own === "1") {
-        games[g.id].push(g);
+      if (g.Status.own !== "1") {
+        return
       }
 
+      if (g.user_rating === 0 && rated) {
+        return
+      }
+
+      games[g.id].push(g);
       return g;
     });
 
@@ -107,6 +110,15 @@ const Component = ({ data, state: { players = 4, time = 120, coop = false, prior
     // contribute to cost if the min player's don't fit the recommended rating.
     cost += Math.abs(bestminplayers - players) * getPriority(priority, "recommended players");
 
+    games[d].map(g => {
+      if (g.user_rating !== 0) {
+        console.log(getPriority(priority, "user rating"))
+        cost += (10.0 - g.user_rating) * getPriority(priority, "user rating") / games[d].length;
+      }
+
+      return d;
+    });
+
     rs.push({
       id,
       name,
@@ -116,6 +128,8 @@ const Component = ({ data, state: { players = 4, time = 120, coop = false, prior
 
     return d;
   });
+
+  console.log(rs.length);
 
   rs.sort((a, b) => a.cost - b.cost);
 

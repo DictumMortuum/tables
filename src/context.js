@@ -45,6 +45,13 @@ const reducer = (state, action) => {
       }
     }
 
+    case "rated": {
+      return {
+        ...state,
+        rated: action.rated,
+      }
+    }
+
     case "players": {
       return {
         ...state,
@@ -96,7 +103,12 @@ export const UserProvider = ({ children }) => {
     players: 4,
     time: 120,
     coop: false,
+    rated: true,
     priority: [{
+      id: 5,
+      name: "user rating",
+      checked: true,
+    }, {
       id: 1,
       name: "rank",
       checked: true,
