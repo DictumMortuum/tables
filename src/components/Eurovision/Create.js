@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, Avatar, IconButton, Card, CardMedia, CardHeader } from '@mui/material';
+import { Box, Button, Avatar, IconButton, Card, CardMedia, CardHeader, CardActions } from '@mui/material';
 import { createEurovisionParticipation } from '../api';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Collapse from '@mui/material/Collapse';
@@ -93,7 +93,8 @@ const CreateContainer = () => {
 
 const Create = ({ data, exists }) => {
   const [boardgame, setBoardgame] = React.useState(data);
-  const [showAll, setShowAll] = React.useState(!exists);
+  // const [showAll, setShowAll] = React.useState(!exists);
+  const [showAll, setShowAll] = React.useState(true);
 
   React.useEffect(() => {
     setBoardgame(data);
@@ -123,12 +124,16 @@ const Create = ({ data, exists }) => {
             image={boardgame.square200 || "https://placehold.co/200"}
             sx={{ marginBottom: 2 }}
           />
-          <Search setBoardgame={setBoardgame} />
-          <CreateButton
-            boardgame={boardgame}
-            exists={exists}
-            setShowAll={setShowAll}
-          />
+          <CardActions>
+            <Search setBoardgame={setBoardgame} />
+          </CardActions>
+          <CardActions>
+            <CreateButton
+              boardgame={boardgame}
+              exists={exists}
+              setShowAll={setShowAll}
+            />
+          </CardActions>
         </Collapse>
       </Card>
     </Box>

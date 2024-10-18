@@ -1,7 +1,7 @@
 import React from 'react';
 import Create from './Create';
-import List from './List';
-import Save from './Save';
+// import List from './List';
+// import Save from './Save';
 import { Grid } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { useEmail } from '../../hooks/useEmail';
@@ -59,23 +59,23 @@ const Container = () => {
 }
 
 const Eurovision = ({ votes, user_id }) => {
-  const [list, setList] = React.useState(votes);
+  // const [list, setList] = React.useState(votes);
 
-  React.useEffect(() => {
-    setList(votes);
-  }, [votes]);
+  // React.useEffect(() => {
+  //   setList(votes);
+  // }, [votes]);
 
   return (
     <Grid container spacing={2} mt={1}>
       <Grid item xs={12}>
         <Create exists={!!user_id} />
       </Grid>
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         <Save items={list} />
       </Grid>
       <Grid item xs={12}>
         <List list={list} setList={setList} />
-      </Grid>
+      </Grid> */}
     </Grid>
   );
 }
