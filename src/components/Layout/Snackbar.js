@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Snackbar from '@mui/material/Snackbar';
-import { UserContext } from '../context';
+import { UserContext } from '../../context';
 
 const Component = () => {
   const { open, msg, setOpen } = React.useContext(UserContext);

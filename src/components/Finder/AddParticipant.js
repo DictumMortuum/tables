@@ -4,7 +4,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { useQuery } from '@tanstack/react-query';
-import Loading from '../Loading';
+import Loading from '../Layout/Loading';
 
 const fetchPlayersWithCollection = async () => {
   const rs = await fetch(`${process.env.REACT_APP_ENDPOINT}/rest/finderusers`, {

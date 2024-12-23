@@ -2,7 +2,7 @@ import React from 'react';
 import { Grid } from '@mui/material';
 import { useEmail } from '../../hooks/useEmail';
 import Picture from './Picture';
-import BGG from './BGG';
+// import BGG from './BGG';
 import { useQuery } from '@tanstack/react-query';
 
 const fetchPlayer = async ({ email }) => {
@@ -17,7 +17,7 @@ const fetchPlayer = async ({ email }) => {
 const Container = () => {
   const { email } = useEmail();
 
-  const { data, isLoading }= useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["player", email],
     queryFn: () => fetchPlayer({ email }),
     enabled: !!email,
@@ -36,9 +36,9 @@ const Component = ({ player }) => {
       <Grid item xs={12}>
         <Picture player={player} />
       </Grid>
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         <BGG player={player} />
-      </Grid>
+      </Grid> */}
     </Grid>
   );
 }

@@ -1,11 +1,12 @@
 import React from 'react';
 import Create from './Create';
-// import List from './List';
-// import Save from './Save';
+import List from './List';
+import Save from './Save';
 import { Grid } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { useEmail } from '../../hooks/useEmail';
-import Loading from '../Loading';
+import Loading from '../Layout/Loading';
+import useConfig from '../../hooks/useConfig';
 
 const fetchEurovisionParticipations = async () => {
   const rs = await fetch(`${process.env.REACT_APP_ENDPOINT}/rest/eurovisionparticipations`, {
@@ -27,7 +28,7 @@ const fetchEurovisionVotes = async ({ user_id }) => {
 }
 
 const Container = () => {
-  const { user_id } = useEmail();
+  const { user_id, email } = useEmail();
 
   const participations = useQuery({
     queryKey: ["participations"],
@@ -49,7 +50,7 @@ const Container = () => {
     const temp = votes.data.votes.map(d => d.id);
     const newvotes = [
       ...votes.data.votes,
-      ...participations.data.filter(d => !temp.includes(d.id)),
+      ...participations.data.filter(d => !temp.includes(d.id)).filter(d => d.email !== email),
     ];
 
     return <Eurovision user_id={user_id} votes={newvotes} />
@@ -59,23 +60,29 @@ const Container = () => {
 }
 
 const Eurovision = ({ votes, user_id }) => {
-  // const [list, setList] = React.useState(votes);
+  const [list, setList] = React.useState(votes);
+  const EUROVISION_SHOW_VOTES_LIST = useConfig("EUROVISION_SHOW_VOTES_LIST");
 
-  // React.useEffect(() => {
-  //   setList(votes);
-  // }, [votes]);
+  React.useEffect(() => {
+    setList(votes);
+  }, [votes]);
 
   return (
     <Grid container spacing={2} mt={1}>
-      <Grid item xs={12}>
-        <Create exists={!!user_id} />
-      </Grid>
-      {/* <Grid item xs={12}>
-        <Save items={list} />
-      </Grid>
-      <Grid item xs={12}>
-        <List list={list} setList={setList} />
-      </Grid> */}
+      {!EUROVISION_SHOW_VOTES_LIST &&
+        <Grid item xs={12}>
+          <Create exists={!!user_id} />
+        </Grid>
+      }
+      {EUROVISION_SHOW_VOTES_LIST &&
+      <>
+        <Grid item xs={12}>
+          <Save items={list} />
+        </Grid>
+        <Grid item xs={12}>
+          <List list={list} setList={setList} />
+        </Grid>
+      </>}
     </Grid>
   );
 }

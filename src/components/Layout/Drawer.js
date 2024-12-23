@@ -5,9 +5,13 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
+import ListItemIcon from '@mui/material/ListItemIcon';
 import { Link } from "react-router-dom";
+import { UserContext } from '../../context';
 
 const Drawer = ({ state, setState }) => {
+  const { state: { user: { components } } } = React.useContext(UserContext);
+
   const toggleDrawer = (open) => (event) => {
     if (
       event &&
@@ -33,29 +37,20 @@ const Drawer = ({ state, setState }) => {
         sx={{ width: 256 }}
       >
         <List>
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/">
-              <ListItemText primary="Tables"  />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/eurovision">
-              <ListItemText primary="Eurovision"  />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/finder">
-              <ListItemText primary="Finder"  />
-            </ListItemButton>
-          </ListItem>
+          {components.map((d, i) => (
+            <ListItem disablePadding key={i}>
+              <ListItemButton component={Link} to={d.link}>
+                <ListItemIcon>
+                  {d.component}
+                </ListItemIcon>
+                <ListItemText primary={d.name} />
+              </ListItemButton>
+            </ListItem>
+          ))}
         </List>
       </Box>
     </SwipeableDrawer>
   );
 }
-
-
-// <Button component={Link} to="/">Tables</Button>
-// <Button component={Link} to="/eurovision">Eurovision</Button>
 
 export default Drawer;

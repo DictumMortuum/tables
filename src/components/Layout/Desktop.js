@@ -1,19 +1,19 @@
 import React from 'react';
 import { Link, Outlet } from "react-router-dom";
 import { Container, Stack } from '@mui/material';
-import Footer from '../Footer';
-import TableBarIcon from '@mui/icons-material/TableBar';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+// import Footer from './Footer';
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
-import Drawer from '../Drawer';
+import Drawer from './Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
 import IconButton from '@mui/material/IconButton';
-import SearchIcon from '@mui/icons-material/Search';
-import Snackbar from '../Snackbar';
+import Snackbar from './Snackbar';
 import Box from '@mui/material/Box';
+import { UserContext } from '../../context';
 
 const Component = ({ email, splitted, onLogout, state, setState }) => {
+  const { state: { user: { components } } } = React.useContext(UserContext);
+
   return (
     <Stack direction="column" sx={{ height: "100%" }}>
       <Container sx={{ marginBottom: 2 }}>
@@ -21,15 +21,11 @@ const Component = ({ email, splitted, onLogout, state, setState }) => {
           <IconButton onClick={() => { setState(true) }}>
             <MenuIcon />
           </IconButton>
-          <IconButton component={Link} to="/">
-            <TableBarIcon />
-          </IconButton>
-          <IconButton component={Link} to="/eurovision">
-            <EmojiEventsIcon />
-          </IconButton>
-          <IconButton component={Link} to="/finder">
-            <SearchIcon />
-          </IconButton>
+          {components.map((d, i) => (
+            <IconButton component={Link} to={d.link} key={i}>
+              {d.component}
+            </IconButton>
+          ))}
           {email !== null &&
             <div style={{ marginLeft: "auto" }}>
               <Box component={Link} to="/profile">{splitted}</Box>
@@ -49,7 +45,7 @@ const Component = ({ email, splitted, onLogout, state, setState }) => {
         <Drawer state={state} setState={setState} />
         <Outlet />
       </Container>
-      <Footer />
+      {/* <Footer /> */}
       <Snackbar />
     </Stack>
   );

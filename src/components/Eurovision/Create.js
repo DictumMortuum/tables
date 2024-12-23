@@ -9,7 +9,7 @@ import { UserContext } from '../../context';
 import { useEmail } from '../../hooks/useEmail';
 import Search from './Search';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import Loading from '../Loading';
+import Loading from '../Layout/Loading';
 
 const fetchUserParticipation = async ({ user_id }) => {
   const rs = await fetch(`${process.env.REACT_APP_ENDPOINT}/rest/eurovisionparticipations/user/${user_id}`);

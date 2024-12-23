@@ -1,6 +1,70 @@
 import React, { createContext } from 'react';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import TableBarIcon from '@mui/icons-material/TableBar';
+// import SearchIcon from '@mui/icons-material/Search';
+import BarChartIcon from '@mui/icons-material/BarChart';
 
 export const UserContext = createContext(null);
+
+const generateComponents = email => [{
+  name: "Home",
+  link: "/",
+  component: <TableBarIcon />,
+},
+{
+  name: "Eurovision",
+  link: "/eurovision",
+  component: <EmojiEventsIcon />,
+},
+// {
+//   name: "Finder",
+//   link: "/finder",
+//   component: <SearchIcon />
+// },
+{
+  name: "Analyzer",
+  link: "/analyzer",
+  component: <BarChartIcon />
+}];
+
+const parseLoginCookie = () => {
+  const raw = localStorage.getItem('auth');
+  const auth = JSON.parse(raw);
+
+  if (auth === null) {
+    return {
+      email: null,
+      user_id: null,
+      components: generateComponents(null),
+    }
+  }
+
+  const { status } = auth;
+
+  if (status !== "OK") {
+    return {
+      email: null,
+      user_id: null,
+      components: generateComponents(null),
+    }
+  }
+
+  const { user: { id, email }} = auth;
+
+  return {
+    email,
+    user_id: id,
+    components: generateComponents(email),
+  }
+}
+
+const getConfig = hm => config => {
+  if (hm[config] !== undefined) {
+    return hm[config];
+  }
+
+  return null;
+}
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -80,6 +144,41 @@ const reducer = (state, action) => {
       }
     }
 
+    case "user::set": {
+      return {
+        ...state,
+        user: parseLoginCookie(),
+      }
+    }
+
+    case "bgg_user::set": {
+      return {
+        ...state,
+        bgg_user: action.bgg_user,
+      }
+    }
+
+    case "collection::set": {
+      return {
+        ...state,
+        collection: action.collection,
+      }
+    }
+
+    case "configuration::set": {
+      const hm = {};
+
+      action.data.forEach(d => {
+        hm[d.config] = d.value;
+      });
+
+      return {
+        ...state,
+        configurations: hm,
+        getConfig: getConfig(hm),
+      }
+    }
+
     default: {
       console.log(action);
       return {
@@ -96,6 +195,10 @@ export const UserProvider = ({ children }) => {
   const [msg, setMsg] = React.useState("");
   const [loading, setLoading] = React.useState(true);
   const [state, dispatch] = React.useReducer(reducer, {
+    bgg_user: "",
+    collection: [],
+    user: parseLoginCookie(),
+    configurations: {},
     participants: {},
     count: 1,
     players: 4,
